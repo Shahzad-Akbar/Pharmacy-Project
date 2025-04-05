@@ -23,9 +23,9 @@ export default function Footer() {
           <div>
             <h3 className="text-lg font-semibold mb-4">Contact Info</h3>
             <ul className="space-y-2 text-gray-300">
-              <li>Email: info@medicalstore.com</li>
-              <li>Phone: (123) 456-7890</li>
-              <li>Address: 123 Medical St, City</li>
+              <li>Email: shahzad@gmail.com</li>
+              <li>Phone: 9199617022</li>
+              <li>Address: Jahangirpuri, New-Delhi, 110033</li>
             </ul>
           </div>
           

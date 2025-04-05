@@ -1,33 +1,28 @@
+import Link from 'next/link'
+
 export default function PublicNavbar() {
   return (
-    <nav className="bg-white shadow-md">
-      <div className="container mx-auto px-6 py-4">
-        <div className="flex justify-between items-center">
-          <div className="flex items-center">
-            <a href="/" className="text-2xl font-bold text-gray-800">
-              Medical Store
-            </a>
-          </div>
+    <nav className="bg-white text-black shadow-md">
+      <div className="container mx-auto px-6 py-4 flex justify-between items-center">
+        <Link href="/" className="text-2xl font-bold text-green-300">PHARMACY</Link>
+        <div className="flex items-center space-x-8">
+          <Link href="/" className="text-gray-700 hover:text-blue-600 transition-colors">Home</Link>
+          <Link href="/about" className="text-gray-700 hover:text-blue-600 transition-colors">About</Link>
+          <Link 
+            href="/login" 
+            className="bg-primary px-4 py-2 rounded-md text-gray-700 hover:text-blue-600 transition-colors"
+          >
+            Login
+          </Link>
+          <Link 
+            href="/signup" 
+            className="bg-primary px-4 py-2 rounded-md text-gray-700 hover:text-blue-600 transition-colors"
+          >
+            Sign Up
+          </Link>
           
-          <div className="flex space-x-6">
-            <a href="/" className="text-gray-700 hover:text-blue-600">
-              Home
-            </a>
-            <a href="/about" className="text-gray-700 hover:text-blue-600">
-              About
-            </a>
-            <a href="/contact" className="text-gray-700 hover:text-blue-600">
-              Contact
-            </a>
-            <a href="/login" className="text-gray-700 hover:text-blue-600">
-              Login
-            </a>
-            <a href="/signup" className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700">
-              Sign Up
-            </a>
-          </div>
         </div>
       </div>
     </nav>
-  );
+  )
 }
