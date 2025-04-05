@@ -2,6 +2,7 @@
 import Link from 'next/link'
 import { useState } from 'react'
 // import { Eye, EyeOff } from 'lucide-react'
+import PublicNavbar from '@/components/shared/PublicNavbar'
 
 export default function LoginPage() {
   const [email, setEmail] = useState('')
@@ -16,6 +17,8 @@ export default function LoginPage() {
   }
 
   return (
+    <>
+    <PublicNavbar/>
     <div className="min-h-screen flex items-center justify-center bg-gray-100 px-4">
       <div className="max-w-md w-full space-y-8 bg-white p-8 rounded-lg shadow-lg">
         {/* Header */}
@@ -106,5 +109,6 @@ export default function LoginPage() {
         </form>
       </div>
     </div>
+    </>
   )
 }

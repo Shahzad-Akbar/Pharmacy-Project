@@ -1,6 +1,7 @@
 'use client'
 import Link from 'next/link'
 import { useState } from 'react'
+import PublicNavbar from '@/components/shared/PublicNavbar'
 
 export default function ForgotPasswordPage() {
   const [email, setEmail] = useState('')
@@ -14,8 +15,10 @@ export default function ForgotPasswordPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100 px-4">
-      <div className="max-w-md w-full space-y-8 bg-white p-8 rounded-lg shadow-lg">
+    <>
+    <PublicNavbar />
+      <div className="min-h-screen flex items-center justify-center bg-gray-100 px-4">
+      <div className="max-w-md w-full space-y-3 bg-white p-8 rounded-lg shadow-lg">
         {/* Header */}
         <div className="">
           <Link href="/" className="text-2xl font-bold text-green-300">
@@ -76,5 +79,6 @@ export default function ForgotPasswordPage() {
         )}
       </div>
     </div>
+    </>
   )
 }
