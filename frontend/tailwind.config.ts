@@ -11,8 +11,8 @@ const config: Config = {
       colors: {
         primary: "#0077B6",  //bg-blue-700
         secondary: "#0096C7",  //bg-sky-600
-        background: "#F8F9FA",
-        textPrimary: "#023E8A",
+        background: "#F8F9FA",  //bg-gray-100
+        textPrimary: "#023E8A", //bg-blue-900
         success: "#2ECC71",
         warning: "#F4A261",
         danger: "#E63946",

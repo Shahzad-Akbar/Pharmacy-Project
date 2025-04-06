@@ -1,7 +1,6 @@
 'use client'
 import Link from 'next/link'
 import { useState } from 'react'
-// import { Eye, EyeOff } from 'lucide-react'
 import PublicNavbar from '@/components/shared/PublicNavbar'
 
 export default function LoginPage() {
