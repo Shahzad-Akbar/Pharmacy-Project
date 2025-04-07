@@ -54,7 +54,7 @@ export default function Home() {
               <p className="text-gray-600 mb-4">Support your daily nutritional needs with our comprehensive multivitamin formula</p>
               <Link 
                 href="/products/multivitamin"
-                className="bg-primary text-white px-4 py-2 rounded inline-block hover:bg-opacity-90"
+                className="bg-blue-300 hover:bg-blue-500 text-white px-4 py-2 rounded inline-block hover:bg-opacity-90"
               >
                 Shop Now
               </Link>
@@ -76,7 +76,7 @@ export default function Home() {
               <p className="text-gray-600 mb-4">Relieve seasonal allergy symptoms with our effective allergy relief tablets</p>
               <Link 
                 href="/products/allergy-relief"
-                className="bg-primary text-white px-4 py-2 rounded inline-block hover:bg-opacity-90"
+                className="bg-blue-300 hover:bg-blue-500 text-white px-4 py-2 rounded inline-block hover:bg-opacity-90"
               >
                 Shop Now
               </Link>
@@ -98,7 +98,7 @@ export default function Home() {
               <p className="text-gray-600 mb-4">Be prepared for any minor injury with our complete and portable first aid kit</p>
               <Link 
                 href="/products/first-aid-kit"
-                className="bg-primary text-white px-4 py-2 rounded inline-block hover:bg-opacity-90"
+                className="bg-blue-300 hover:bg-blue-500 text-white px-4 py-2 rounded inline-block hover:bg-opacity-90"
               >
                 Shop Now
               </Link>
