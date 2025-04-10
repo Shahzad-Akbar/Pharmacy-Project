@@ -16,23 +16,23 @@ export default function UserNavbar() {
     <nav className="bg-white shadow-md">
       <div className="container mx-auto px-6 py-4">
         <div className="flex justify-between items-center">
-          <Link href="/dashboard" className="text-2xl font-bold text-primary">
+          <Link href="/dashboard" className="text-2xl font-bold text-green-300">
             PHARMACY
           </Link>
 
           <div className="hidden md:flex items-center space-x-6">
-            <Link href="/product" className="text-gray-600 hover:text-primary">
+            <Link href="/product" className="text-gray-600 hover:text-blue-600">
               Products
             </Link>
-            <Link href="/cart" className="text-gray-600 hover:text-primary">
+            <Link href="/cart" className="text-gray-600 hover:text-blue-600">
               Cart (0)
             </Link>
-            <Link href="/profile" className="text-gray-600 hover:text-primary">
+            <Link href="/profile" className="text-gray-600 hover:text-blue-600">
               Profile
             </Link>
             <button
               onClick={handleLogout}
-              className="bg-primary text-white px-4 py-2 rounded hover:bg-primary/90"
+              className="bg-blue-400 text-white px-4 py-2 rounded hover:bg-blue-700"
             >
               Logout
             </button>
@@ -56,18 +56,18 @@ export default function UserNavbar() {
         {/* Mobile menu */}
         <div className={`md:hidden ${isOpen ? 'block' : 'hidden'} mt-4`}>
           <div className="flex flex-col space-y-4">
-            <Link href="/product" className="text-gray-600 hover:text-primary">
+            <Link href="/product" className="text-gray-600 hover:text-blue-600">
               Products
             </Link>
-            <Link href="/cart" className="text-gray-600 hover:text-primary">
+            <Link href="/cart" className="text-gray-600 hover:text-blue-600">
               Cart (0)
             </Link>
-            <Link href="/profile" className="text-gray-600 hover:text-primary">
+            <Link href="/profile" className="text-gray-600 hover:text-blue-600">
               Profile
             </Link>
             <button
               onClick={handleLogout}
-              className="bg-primary text-white px-4 py-2 rounded hover:bg-primary/90 w-full text-left"
+              className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-800 w-full text-left"
             >
               Logout
             </button>
