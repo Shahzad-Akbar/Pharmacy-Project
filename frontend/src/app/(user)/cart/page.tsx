@@ -129,7 +129,9 @@ export default function CartPage() {
                   </div>
                 </div>
               </div>
-              <button className="w-full mt-6 bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700">
+              <button 
+              onClick={() => window.location.href = '/checkout'}
+              className="w-full mt-6 bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700">
                 Proceed to Checkout
               </button>
               <Link 
