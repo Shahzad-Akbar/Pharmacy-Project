@@ -1,9 +1,11 @@
 'use client'
 import { useState } from 'react'
-import { Search, Filter, Heart, ShoppingCart } from 'lucide-react'
+import { Search, Filter, Heart, ShoppingCart, ShoppingBag } from 'lucide-react'
 import Image from 'next/image'
+import Link from 'next/link'
 
 export default function Product() {
+  const [cartCount, setCartCount] = useState(0)
   const [products] = useState([
     {
       id: 1,
@@ -63,8 +65,14 @@ export default function Product() {
     return matchesCategory && matchesSearch
   })
 
+  const handleAddToCart = () => {
+    setCartCount(prev => prev + 1)
+  }
+
   return (
     <div className="container mx-auto px-4 py-8 bg-cyan-50">
+      {/* Remove the floating cart button from here */}
+      
       {/* Header Section */}
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-gray-800 mb-4">Our Products</h1>
@@ -138,6 +146,7 @@ export default function Product() {
                       : 'bg-gray-200 text-gray-400 cursor-not-allowed'
                   }`}
                   disabled={!product.inStock}
+                  onClick={() => product.inStock && handleAddToCart()}
                 >
                   <ShoppingCart size={18} />
                   Add to Cart
@@ -147,6 +156,17 @@ export default function Product() {
           </div>
         ))}
       </div>
+
+      {/* View Cart Button */}
+      <div className="flex justify-end mt-8">
+          <Link
+            href="/cart"
+            className="bg-cyan-400 text-white px-6 py-3 rounded-lg shadow-md hover:bg-cyan-700 flex items-center gap-2"
+          >
+            <ShoppingBag size={20} />
+            <span>View Cart ({cartCount})</span>
+          </Link>
+        </div>
     </div>
   )
 }
