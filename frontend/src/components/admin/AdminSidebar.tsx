@@ -1,8 +1,8 @@
 export default function AdminSidebar() {
   return (
-    <aside className="bg-gray-800 text-white w-64 min-h-screen p-4">
+    <aside className="bg-gray-800 text-white w-54 min-h-screen p-4">
       <div className="mb-8">
-        <h2 className="text-2xl font-bold">Medical Store</h2>
+        <h2 className="text-2xl font-bold text-green-300">PHARMACY</h2>
       </div>
       
       <nav className="space-y-2">
