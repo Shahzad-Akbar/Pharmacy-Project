@@ -15,7 +15,7 @@ export default function AdminSidebar() {
         <a href="/admin/inventory" className="block px-4 py-2 rounded hover:bg-gray-700">
           Inventory
         </a>
-        <a href="/admin/manage" className="block px-4 py-2 rounded hover:bg-gray-700">
+        <a href="/admin/orders" className="block px-4 py-2 rounded hover:bg-gray-700">
           Orders
         </a>
         <a href="/admin/users" className="block px-4 py-2 rounded hover:bg-gray-700">
