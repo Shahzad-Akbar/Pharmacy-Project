@@ -1,10 +1,6 @@
-import internal from 'stream';
 import {generateTokenAndSetCookie} from '../lib/utils/generateToken.js';
 import User from '../models/user.model.js';
 import bcrypt from 'bcryptjs';
-import jwt from 'jsonwebtoken';
-import { server } from 'typescript';
-
 
 // Email validation regex
 const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;

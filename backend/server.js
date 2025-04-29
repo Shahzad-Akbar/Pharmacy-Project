@@ -1,8 +1,9 @@
-import express, { urlencoded } from 'express';
+import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import connectMongoDB from './config/connectMongoDB.js';
 import authRoutes from './routes/auth.routes.js';
+import userRoutes from './routes/user.routes.js';
 import cookieParser from 'cookie-parser';
 
 dotenv.config();
@@ -17,6 +18,7 @@ app.use(cookieParser());
 const PORT = process.env.PORT || 5000;
 
 app.use('/api/auth', authRoutes);
+app.use('/api/users', userRoutes);
 
 
 app.listen(PORT, () => {
