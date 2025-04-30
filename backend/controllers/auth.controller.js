@@ -1,6 +1,8 @@
 import {generateTokenAndSetCookie} from '../lib/utils/generateToken.js';
 import User from '../models/user.model.js';
 import bcrypt from 'bcryptjs';
+import crypto from 'crypto';
+import sendEmail from '../utils/sendEmail.js';
 
 // Email validation regex
 const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
@@ -159,3 +161,102 @@ export const getMe = async (req, res) => {
         res.status(500).json({error: "internal server error"});
     } 
 }
+
+
+export const forgotPassword = async (req, res) => {
+    try {
+        const { email } = req.body;
+        const user = await User.findOne({ email });
+
+        if (!user) {
+            return res.status(404).json({ error: "User with this email does not exist" });
+        }
+
+        // Generate unique reset token
+        const resetToken = crypto.randomBytes(32).toString('hex');
+        user.resetPasswordToken = crypto.createHash('sha256').update(resetToken).digest('hex');
+        user.resetPasswordExpire = Date.now() + 10 * 60 * 1000;
+
+        await user.save();
+
+        // Send reset token directly in email
+        const message = `
+            <h2>Hello ${user.fullName}</h2>
+            <p>You requested a password reset for your Pharmacy account.</p>
+            <p>Here is your password reset token:</p>
+            <h3>${resetToken}</h3>
+            <p>Use this token to reset your password.</p>
+            <p><strong>This token will expire in 10 minutes.</strong></p>
+        `;
+
+        await sendEmail({
+            email: user.email,
+            subject: 'Password Reset Token - Pharmacy Website',
+            html: message
+        });
+
+        res.status(200).json({
+            success: true,
+            message: "Password reset token sent to your email"
+        });
+
+    } catch (error) {
+       
+        console.error("Error in forgotPassword:", error);
+        res.status(500).json({ error: "Failed to send reset email. Please try again later." });
+    }
+};
+
+export const resetPassword = async (req, res) => {
+    try {
+        const { resetToken, newPassword } = req.body;
+
+        if (!resetToken || !newPassword) {
+            return res.status(400).json({ error: "Please provide both reset token and new password" });
+        }
+
+        const resetPasswordToken = crypto.createHash('sha256').update(resetToken).digest('hex');
+
+        const user = await User.findOne({
+            resetPasswordToken,
+            resetPasswordExpire: { $gt: Date.now() }
+        });
+
+        if (!user) {
+            return res.status(400).json({ error: "Invalid or expired reset link. Please request a new one." });
+        }
+
+        if (newPassword.length < 6) {
+            return res.status(400).json({ error: "Password must be at least 6 characters long" });
+        }
+
+        // Set new password and clear reset token
+        const salt = await bcrypt.genSalt(10);
+        user.password = await bcrypt.hash(newPassword, salt);
+        user.resetPasswordToken = undefined;
+        user.resetPasswordExpire = undefined;
+
+        await user.save();
+
+        // Send confirmation email
+        const message = `
+            <h2>Hello ${user.fullName}</h2>
+            <p>Your password has been successfully reset.</p>
+            <p>If you didn't make this change, please contact our support team immediately.</p>
+        `;
+
+        await sendEmail({
+            email: user.email,
+            subject: 'Password Reset Successful',
+            html: message
+        });
+
+        res.status(200).json({
+            success: true,
+            message: "Password reset successful. You can now login with your new password."
+        });
+    } catch (error) {
+        console.error("Error in resetPassword:", error);
+        res.status(500).json({ error: "Failed to reset password. Please try again." });
+    }
+};
