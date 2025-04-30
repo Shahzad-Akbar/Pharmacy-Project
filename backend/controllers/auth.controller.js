@@ -172,36 +172,49 @@ export const forgotPassword = async (req, res) => {
             return res.status(404).json({ error: "User with this email does not exist" });
         }
 
-        // Generate unique reset token
         const resetToken = crypto.randomBytes(32).toString('hex');
         user.resetPasswordToken = crypto.createHash('sha256').update(resetToken).digest('hex');
         user.resetPasswordExpire = Date.now() + 10 * 60 * 1000;
 
         await user.save();
 
-        // Send reset token directly in email
+        // Create reset URL with token
+        const resetUrl = `${process.env.FRONTEND_URL}/reset-password/${resetToken}`;
         const message = `
-            <h2>Hello ${user.fullName}</h2>
-            <p>You requested a password reset for your Pharmacy account.</p>
-            <p>Here is your password reset token:</p>
-            <h3>${resetToken}</h3>
-            <p>Use this token to reset your password.</p>
-            <p><strong>This token will expire in 10 minutes.</strong></p>
+            <div style="max-width: 600px; margin: 0 auto; padding: 20px; font-family: Arial, sans-serif;">
+                <h2 style="color: #333;">Hello ${user.fullName}</h2>
+                <p>You requested a password reset for your Pharmacy account.</p>
+                <p>Click the button below to set a new password:</p>
+                <a href="${resetUrl}" 
+                   style="background-color: #4CAF50; 
+                          color: white; 
+                          padding: 12px 24px; 
+                          text-decoration: none; 
+                          border-radius: 4px; 
+                          display: inline-block;
+                          margin: 16px 0;">
+                    Reset Password
+                </a>
+                <p style="color: #666;">If the button doesn't work, copy and paste this link:</p>
+                <p style="color: #666; word-break: break-all;">${resetUrl}</p>
+                <p style="color: #ff0000;"><strong>This link will expire in 10 minutes.</strong></p>
+                <hr style="border: 1px solid #eee; margin: 20px 0;">
+                <p style="color: #999; font-size: 12px;">If you didn't request this reset, please ignore this email.</p>
+            </div>
         `;
 
         await sendEmail({
             email: user.email,
-            subject: 'Password Reset Token - Pharmacy Website',
+            subject: 'Reset Your Password - Pharmacy Website',
             html: message
         });
 
         res.status(200).json({
             success: true,
-            message: "Password reset token sent to your email"
+            message: "Password reset link sent to your email"
         });
 
     } catch (error) {
-       
         console.error("Error in forgotPassword:", error);
         res.status(500).json({ error: "Failed to send reset email. Please try again later." });
     }
