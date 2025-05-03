@@ -1,9 +1,16 @@
 import Product from '../models/product.model.js';
+import { v2 as cloudinary } from "cloudinary";
 
 // Create new product
 export const createProduct = async (req, res) => {
     try {
-        const { name, description, price, image, category, stock, requiresPrescription, manufacturer, expiryDate } = req.body;
+        const { name, description, price, category, stock, requiresPrescription, manufacturer, expiryDate } = req.body;
+        let { image } = req.body;
+
+        if (image) {
+			const uploadedResponse = await cloudinary.uploader.upload(image);
+			image = uploadedResponse.secure_url;
+		}
 
         const newProduct = new Product({
             name,
@@ -66,9 +73,15 @@ export const updateProduct = async (req, res) => {
         const product = await Product.findById(req.params.id);
         if (!product) return res.status(404).json({ error: "Product not found" });
 
+        let {image} = req.body;
+        if (req.body.image && req.body.image !== product.image) {
+            const uploadResponse = await cloudinary.uploader.upload(req.body.image);
+            image = uploadResponse.secure_url;
+        }
+
         const updatedProduct = await Product.findByIdAndUpdate(
             req.params.id,
-            { ...req.body},
+            { ...req.body, image },
             { new: true }
         );
 
