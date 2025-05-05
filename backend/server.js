@@ -6,6 +6,7 @@ import authRoutes from './routes/auth.routes.js';
 import userRoutes from './routes/user.routes.js';
 import productRoutes from './routes/product.routes.js';
 import cartRoutes from './routes/cart.routes.js';
+import prescriptionRoutes from './routes/prescription.routes.js';
 import cookieParser from 'cookie-parser';
 import { v2 as cloudinary } from "cloudinary";
 
@@ -30,6 +31,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/products', productRoutes);
 app.use('/api/cart', cartRoutes);
+app.use('/api/prescriptions', prescriptionRoutes);
 
 
 app.listen(PORT, () => {
