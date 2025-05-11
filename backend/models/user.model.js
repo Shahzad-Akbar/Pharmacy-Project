@@ -26,7 +26,7 @@ const userSchema = new mongoose.Schema({
   },
   orders: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Order' }],
   isActive: { type: Boolean, default: true },
-  resetPasswordToken: String,
+  resetPasswordToken: {type: String},
   resetPasswordExpire: Date
 }, { timestamps: true });
 

@@ -1,12 +1,16 @@
 'use client'
 import Link from 'next/link'
 import { useState } from 'react'
+import { useRouter } from 'next/navigation'
+import axios from 'axios'
 import PublicNavbar from '@/components/shared/PublicNavbar'
 
 export default function SignupPage() {
+  const router = useRouter();
+  const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
-    firstName: '',
-    lastName: '',
+    username: '',
+    fullName: '',
     email: '',
     password: '',
     phoneNumber: '',
@@ -14,20 +18,38 @@ export default function SignupPage() {
     termsAccepted: false
   })
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value, type, checked } = e.target
-    setFormData(prev => ({
-      ...prev,
-      [name]: type === 'checkbox' ? checked : value
-    }))
+  const handleChange = (e) => {
+    setFormData({...formData, [e.target.name]: e.target.value});
   }
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    // Handle signup logic here
-    console.log(formData)
-  }
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    
+    if (!formData.termsAccepted) {
+      alert('Please accept the terms and conditions.');
+      return;
+    }
 
+    try {
+      setIsLoading(true);
+      const response = await axios.post('http://localhost:5000/api/auth/signup', {
+        username: formData.username,
+        fullName: formData.fullName,
+        email: formData.email,
+        password: formData.password,
+        phoneNumber: formData.phoneNumber
+      });
+      
+      localStorage.setItem('token', response.data.token);
+      router.push('/login');
+    } catch (error) {
+      alert(error.response?.data?.message || 'Something went wrong!');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  
   return (
     <div>
       <PublicNavbar />
@@ -43,34 +65,34 @@ export default function SignupPage() {
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
           <div className="space-y-4">
             <div>
-              <label htmlFor="firstName" className="block text-sm font-medium text-gray-800">
-                First name
+              <label htmlFor="username" className="block text-sm font-medium text-gray-800">
+                Username
               </label>
               <input
-                id="firstName"
-                name="firstName"
+                id="username"
+                name="username"
                 type="text"
                 required
-                value={formData.firstName}
+                value={formData.username}
                 onChange={handleChange}
                 className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm text-black focus:outline-none focus:ring-primary focus:border-primary"
-                placeholder="First name"
+                placeholder="UserName"
               />
             </div>
 
             <div>
-              <label htmlFor="lastName" className="block text-sm font-medium text-gray-800">
-                Last name
+              <label htmlFor="fullName" className="block text-sm font-medium text-gray-800">
+                Full name
               </label>
               <input
-                id="lastName"
-                name="lastName"
+                id="fullName"
+                name="fullName"
                 type="text"
                 required
-                value={formData.lastName}
+                value={formData.fullName}
                 onChange={handleChange}
                 className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm text-black focus:outline-none focus:ring-primary focus:border-primary"
-                placeholder="Last name"
+                placeholder="Full name"
               />
             </div>
 
@@ -122,19 +144,7 @@ export default function SignupPage() {
               />
             </div>
 
-            <div className="flex items-center">
-              <input
-                id="promotionalEmails"
-                name="promotionalEmails"
-                type="checkbox"
-                checked={formData.promotionalEmails}
-                onChange={handleChange}
-                className="h-4 w-4 text-primary focus:ring-primary border-gray-300 rounded"
-              />
-              <label htmlFor="promotionalEmails" className="ml-2 block text-sm text-gray-900">
-                I am interested in receiving promotional emails from Pharmacy.
-              </label>
-            </div>
+            
 
             <div className="flex items-center">
               <input
@@ -153,11 +163,12 @@ export default function SignupPage() {
           </div>
 
           <button
-            type="submit"
-            className="w-full flex justify-center py-2 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-blue-500 hover:bg-secondary focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary"
-          >
-            Sign up
-          </button>
+    type="submit"
+    disabled={isLoading}
+    className="w-full flex justify-center py-2 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-blue-500 hover:bg-secondary focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary disabled:opacity-50"
+  >
+    {isLoading ? 'Signing up...' : 'Sign up'}
+  </button>
 
           <div className="text-center text-sm">
             <span className="text-gray-600">Already have an account? </span>

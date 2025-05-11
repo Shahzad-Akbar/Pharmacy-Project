@@ -195,8 +195,7 @@ export const forgotPassword = async (req, res) => {
                           margin: 16px 0;">
                     Reset Password
                 </a>
-                <p style="color: #666;">If the button doesn't work, copy and paste this link:</p>
-                <p style="color: #666; word-break: break-all;">${resetUrl}</p>
+                
                 <p style="color: #ff0000;"><strong>This link will expire in 10 minutes.</strong></p>
                 <hr style="border: 1px solid #eee; margin: 20px 0;">
                 <p style="color: #999; font-size: 12px;">If you didn't request this reset, please ignore this email.</p>

@@ -1,113 +1,134 @@
 'use client'
 import Link from 'next/link'
 import { useState } from 'react'
+import { useRouter } from 'next/navigation'
+import axios from 'axios'
 import PublicNavbar from '@/components/shared/PublicNavbar'
+import { Eye, EyeOff } from 'lucide-react'
 
 export default function LoginPage() {
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
-  const [showPassword, setShowPassword] = useState(false)
+  const router = useRouter();
+  const [isLoading, setIsLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [formData, setFormData] = useState({
+    email: '',
+    password: ''
+  });
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    // Handle login logic here
-    setEmail('')
-    setPassword('')
-  }
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+
+  const togglePasswordVisibility = () => {
+    setShowPassword(!showPassword);
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    
+    try {
+      setIsLoading(true);
+      const response = await axios.post('http://localhost:5000/api/auth/login', {
+        email: formData.email,
+        password: formData.password
+      });
+      
+      localStorage.setItem('token', response.data.token);
+      router.push('/dashboard');
+    } catch (error) {
+      alert(error.response?.data?.message || 'Invalid credentials');
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   return (
-    <>
-    <PublicNavbar/>
-    <div className="min-h-screen flex items-center justify-center bg-gray-100 px-4">
-      <div className="max-w-md w-full space-y-8 bg-white p-8 rounded-lg shadow-lg">
-        {/* Header */}
-        <div className="">
-          <Link href="/" className="text-2xl font-bold text-green-300">
-            PHARMACY
-          </Link>
-          <h2 className="mt-6 text-3xl font-bold text-gray-900 text-center">Log In</h2>
-        </div>
+    <div>
+      <PublicNavbar />
+      <div className="min-h-screen flex items-center justify-center bg-gray-100 px-4 py-12">
+        <div className="max-w-md w-full space-y-8 bg-white p-8 rounded-lg shadow-lg">
+          <div>
+            <Link href="/" className="text-2xl font-bold text-green-300">
+              PHARMACY
+            </Link>
+            <h2 className="mt-6 text-3xl font-bold text-gray-900 text-center">Sign in to your account</h2>
+          </div>
 
-        {/* Form */}
-        <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
-          <div className="space-y-4">
-            <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-800">
-                Email Address
-              </label>
-              <input
-                id="email"
-                name="email"
-                type="email"
-                required
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm text-black focus:outline-none focus:ring-primary focus:border-primary"
-                placeholder="Enter your email"
-              />
-            </div>
-
-            {/* Modified password field with show/hide toggle */}
-            <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-800">
-                Password
-              </label>
-              <div className="relative">
+          <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
+            <div className="space-y-4">
+              <div>
+                <label htmlFor="email" className="block text-sm font-medium text-gray-800">
+                  Email
+                </label>
                 <input
-                  id="password"
-                  name="password"
-                  type={showPassword ? "text" : "password"}
+                  id="email"
+                  name="email"
+                  type="email"
                   required
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  className="mt-1 block w-full px-3 py-2 border border-gray-300 text-black rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary"
-                  placeholder="Enter your password"
+                  value={formData.email}
+                  onChange={handleChange}
+                  className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm text-black focus:outline-none focus:ring-primary focus:border-primary"
+                  placeholder="Email address"
                 />
               </div>
-            </div>
-          </div>
 
-          <div className="flex items-center justify-between">
-            <div className="flex items-center">
-              <input
-                id="show-password"
-                name="show-password"
-                type="checkbox"
-                checked={showPassword}
-                onChange={(e) => setShowPassword(e.target.checked)}
-                className="h-4 w-4 text-primary focus:ring-primary border-gray-300 rounded"
-              />
-              <label htmlFor="show-password" className="ml-2 block text-sm text-gray-900">
-                Show Password
-              </label>
+              <div>
+                <label htmlFor="password" className="block text-sm font-medium text-gray-800">
+                  Password
+                </label>
+                <div className="relative">
+                  <input
+                    id="password"
+                    name="password"
+                    type={showPassword ? "text" : "password"}
+                    required
+                    value={formData.password}
+                    onChange={handleChange}
+                    className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm text-black focus:outline-none focus:ring-primary focus:border-primary"
+                    placeholder="Password"
+                  />
+                  <button
+                    type="button"
+                    onClick={togglePasswordVisibility}
+                    className="absolute inset-y-0 right-0 pr-3 flex items-center"
+                  >
+                    {showPassword ? (
+                      <EyeOff className="h-5 w-5 text-gray-400" />
+                    ) : (
+                      <Eye className="h-5 w-5 text-gray-400" />
+                    )}
+                  </button>
+                </div>
+              </div>
+
+              <div className="text-sm text-right">
+                <Link href="/forgot-password" className="font-medium text-blue-700 hover:text-sky-600">
+                  Forgot your password?
+                </Link>
+              </div>
             </div>
 
-            <Link
-              href="/forgot-password"
-              className="text-sm font-medium text-blue-700 hover:text-sky-600
-"
+            <button
+              type="submit"
+              disabled={isLoading}
+              className="w-full flex justify-center py-2 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-blue-500 hover:bg-secondary focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary disabled:opacity-50"
             >
-              Forgot your password?
-            </Link>
-          </div>
+              {isLoading ? 'Signing in...' : 'Sign in'}
+            </button>
 
-          <button
-            type="submit"
-            onClick={handleSubmit}
-            className="w-full flex justify-center py-2 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-blue-500 hover:bg-secondary focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary"
-          >
-            Login
-          </button>
-
-          <div className="text-center text-sm">
-            <span className="text-gray-600">Do not have an account? </span>
-            <Link href="/signup" className="font-medium text-blue-700 hover:text-sky-600">
-              Sign up
-            </Link>
-          </div>
-        </form>
+            <div className="text-center text-sm">
+              <span className="text-gray-600">Don&apos;t have an account? </span>
+              <Link href="/signup" className="font-medium text-blue-700 hover:text-sky-600">
+                Sign up
+              </Link>
+            </div>
+          </form>
+        </div>
       </div>
     </div>
-    </>
-  )
+  );
 }
