@@ -2,14 +2,26 @@
 import Link from 'next/link'
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
+import axios from 'axios'
 
 export default function UserNavbar() {
   const [isOpen, setIsOpen] = useState(false)
   const router = useRouter()
 
-  const handleLogout = () => {
-    // Add logout logic here
-    router.push('/login')
+  const handleLogout = async () => {
+    try {
+      // Remove token from localStorage
+      localStorage.removeItem('token');
+      
+      // Call logout endpoint
+      await axios.post('http://localhost:5000/api/auth/logout', {}, {
+        withCredentials: true
+      });
+      
+      router.push('/login');
+    } catch (error) {
+      console.error('Logout failed:', error);
+    }
   }
 
   return (

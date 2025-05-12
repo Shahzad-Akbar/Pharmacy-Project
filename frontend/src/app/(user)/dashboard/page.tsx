@@ -1,6 +1,7 @@
 'use client'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
+import axios from 'axios'
 import {
   ShoppingBag,
   Package,
@@ -13,6 +14,13 @@ import {
 } from 'lucide-react'
 
 export default function UserDashboard() {
+  const [dashboardData, setDashboardData] = useState({
+    totalOrders: '0',
+    pendingOrders: '0',
+    activePrescriptions: '0',
+    lastOrderDate: null
+  })
+
   const [notifications] = useState([
     { id: 1, message: 'Your order #123 has been shipped', time: '2 hours ago' },
     { id: 2, message: 'New products available in store', time: '5 hours ago' },
@@ -23,6 +31,22 @@ export default function UserDashboard() {
     { id: '#124', date: '2024-02-18', status: 'Processing', amount: '₹599' },
   ])
 
+  useEffect(() => {
+    const fetchDashboardStats = async () => {
+      try {
+        const token = localStorage.getItem('token')
+        const response = await axios.get('http://localhost:5000/api/dashboard/stats', {
+          headers: { Authorization: `Bearer ${token}` }
+        })
+        setDashboardData(response.data)
+      } catch (error) {
+        console.error('Failed to fetch dashboard stats:', error)
+      }
+    }
+
+    fetchDashboardStats()
+  }, [])
+
   const quickActions = [
     { icon: ShoppingBag, label: 'New Order', href: '/product' },
     { icon: Heart, label: 'Wishlist', href: '/wishlist' },
@@ -31,10 +55,10 @@ export default function UserDashboard() {
   ]
 
   const stats = [
-    { icon: Package, label: 'Total Orders', value: '12' },
-    { icon: Clock, label: 'Pending Orders', value: '2' },
-    { icon: Calendar, label: 'Last Order', value: '2 days ago' },
-    { icon: AlertCircle, label: 'Active Prescriptions', value: '3' },
+    { icon: Package, label: 'Total Orders', value: dashboardData.totalOrders },
+    { icon: Clock, label: 'Pending Orders', value: dashboardData.pendingOrders },
+    { icon: Calendar, label: 'Last Order', value: dashboardData.lastOrderDate ? new Date(dashboardData.lastOrderDate).toLocaleDateString() : 'No orders yet' },
+    { icon: AlertCircle, label: 'Active Prescriptions', value: dashboardData.activePrescriptions }
   ]
 
   return (

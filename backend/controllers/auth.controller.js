@@ -3,6 +3,7 @@ import User from '../models/user.model.js';
 import bcrypt from 'bcryptjs';
 import crypto from 'crypto';
 import sendEmail from '../utils/sendEmail.js';
+import jwt from 'jsonwebtoken';
 
 // Email validation regex
 const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
@@ -110,9 +111,20 @@ export const login = async (req, res) => {
         user.lastLogin = new Date();
         await user.save();
 
-        // Generate token
-        generateTokenAndSetCookie(user._id, res);
+        // Generate token and get it
+        const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, {
+            expiresIn: '15d'
+        });
 
+        // Set cookie
+        res.cookie('jwt', token, {
+            maxAge: 15 * 24 * 60 * 60 * 1000,
+            httpOnly: true,
+            sameSite: 'strict',
+            secure: process.env.NODE_ENV !== 'development'
+        });
+
+        // Send response with token
         res.status(200).json({
             _id: user._id,
             username: user.username,
@@ -122,9 +134,8 @@ export const login = async (req, res) => {
             phone: user.phone,
             profileImg: user.profileImg,
             isActive: user.isActive,
+            token: token // Add token to response
         });
-
-        
     } catch (error) {
         console.error("error in login controller", error.message);
         res.status(500).json({
