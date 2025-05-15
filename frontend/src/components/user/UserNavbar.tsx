@@ -31,11 +31,11 @@ export default function UserNavbar() {
           </Link>
 
           <div className="hidden md:flex items-center space-x-6">
-            <Link href="/product" className="text-gray-600 hover:text-blue-600">
-              Products
+            <Link href="/dashboard" className="text-gray-600 hover:text-blue-600">
+              Dashboard
             </Link>
             <Link href="/cart" className="text-gray-600 hover:text-blue-600">
-              Cart (0)
+              Cart
             </Link>
             <Link href="/profile" className="text-gray-600 hover:text-blue-600">
               Profile
