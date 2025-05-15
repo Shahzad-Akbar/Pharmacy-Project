@@ -14,9 +14,7 @@ export default function UserNavbar() {
       localStorage.removeItem('token');
       
       // Call logout endpoint
-      await axios.post('http://localhost:5000/api/auth/logout', {}, {
-        withCredentials: true
-      });
+      await axios.post('http://localhost:5000/api/auth/logout');
       
       router.push('/login');
     } catch (error) {

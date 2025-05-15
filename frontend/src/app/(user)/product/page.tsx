@@ -3,6 +3,8 @@ import { useState, useEffect } from 'react'
 import { Search, Filter, ShoppingCart, Heart } from 'lucide-react'
 import Image from 'next/image'
 import axios from 'axios'
+import toast from 'react-hot-toast'
+import Link from 'next/link'
 
 interface Product {
   _id: string
@@ -22,6 +24,7 @@ export default function ProductPage() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [wishlistItems, setWishlistItems] = useState<string[]>([])
+  const [loadingCartItems, setLoadingCartItems] = useState<string[]>([])
 
   const categories = ['all', 'Pain Relief', 'Vitamins', 'Antibiotics', 'First Aid', 'Skincare']
 
@@ -50,12 +53,24 @@ export default function ProductPage() {
   const addToCart = async (productId: string) => {
     try {
       const token = localStorage.getItem('token')
+      if (!token) {
+        toast.error('Please login to add items to cart')
+        return
+      }
+
+      setLoadingCartItems(prev => [...prev, productId])
+
       await axios.post('http://localhost:5000/api/cart/add', 
         { productId, quantity: 1 },
         { headers: { Authorization: `Bearer ${token}` } }
       )
+      
+      toast.success('Product added to cart successfully')
     } catch (error) {
+      toast.error('Failed to add product to cart')
       console.error('Failed to add to cart:', error)
+    } finally {
+      setLoadingCartItems(prev => prev.filter(id => id !== productId))
     }
   }
 
@@ -171,15 +186,20 @@ export default function ProductPage() {
                 <div className="flex gap-2">
                   <button
                     onClick={() => addToCart(product._id)}
-                    disabled={product.stock === 0}
+                    disabled={product.stock === 0 || loadingCartItems.includes(product._id)}
                     className={`flex-1 py-2 rounded-lg flex items-center justify-center gap-2 ${
                       product.stock > 0
                         ? 'bg-blue-600 text-white hover:bg-blue-700'
                         : 'bg-gray-200 text-gray-500 cursor-not-allowed'
                     }`}
                   >
-                    <ShoppingCart size={18} />
-                    {product.stock > 0 ? 'Add to Cart' : 'Out of Stock'}
+                    <ShoppingCart size={18} className={loadingCartItems.includes(product._id) ? 'animate-spin' : ''} />
+                    {loadingCartItems.includes(product._id) 
+                      ? 'Adding...' 
+                      : product.stock > 0 
+                        ? 'Add to Cart' 
+                        : 'Out of Stock'
+                    }
                   </button>
                   <button
                     onClick={() => toggleWishlist(product._id)}
@@ -205,6 +225,18 @@ export default function ProductPage() {
             <p className="text-gray-500">No products found</p>
           </div>
         )}
+        <div className='bottom-0 right-1'>
+        <Link 
+          href="/cart"
+          className=" flex items-center gap-2 bg-gradient-to-r from-cyan-600 to-blue-400 hover:from-blue-400 hover:to-cyan-500
+                     text-white px-6 py-3 rounded-lg shadow-lg hover:shadow-xl  sm:m-[50px]  sm:px-8 sm:py-2 md:mx-50 md:my:20 md:px-12 
+                     md:py-3 lg:ml-240 lg:mr-5 lg:mt-5 lg:py-4"
+        >
+          <ShoppingCart size={24} className="sm:w-5 md:w-6" />
+          <span className="font-medium sm:text-sm md:text-base">View Cart</span>
+        </Link>
+
+        </div>
       </div>
     </div>
   )
