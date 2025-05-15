@@ -9,6 +9,7 @@ export const createOrder = async (req, res) => {
             shippingAddress, 
             paymentMethod,
             deliveryCharge,
+            paymentScreenshot,
             prescription,
             notes,
             estimatedDeliveryDate 
@@ -27,6 +28,7 @@ export const createOrder = async (req, res) => {
             shippingAddress,
             paymentMethod,
             deliveryCharge: deliveryCharge || 0,
+            paymentScreenshot,
             prescription,
             notes,
             estimatedDeliveryDate

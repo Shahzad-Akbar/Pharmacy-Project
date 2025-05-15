@@ -29,10 +29,11 @@ const orderSchema = new mongoose.Schema({
   },
   paymentMethod: {
     type: String,
-    enum: ['cash', 'card', 'bank-transfer'],
+    enum: ['COD', 'card', 'bank-transfer', 'QR'],
     required: true
   },
   deliveryCharge: { type: Number, default: 0 },
+  paymentScreenshot: { type: String },
   tracking: { type: String },
   prescription: { type: mongoose.Schema.Types.ObjectId, ref: 'Prescription' },
   notes: { type: String },
