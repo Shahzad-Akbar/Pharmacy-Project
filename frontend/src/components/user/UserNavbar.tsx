@@ -12,6 +12,7 @@ export default function UserNavbar() {
     try {
       // Remove token from localStorage
       localStorage.removeItem('token');
+      localStorage.removeItem('role');
       
       // Call logout endpoint
       await axios.post('http://localhost:5000/api/auth/logout');

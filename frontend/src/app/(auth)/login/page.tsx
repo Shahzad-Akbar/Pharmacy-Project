@@ -38,7 +38,12 @@ export default function LoginPage() {
       });
       
       localStorage.setItem('token', response.data.token);
-      router.push('/dashboard');
+      localStorage.setItem('role', response.data.role);
+      if (response.data.role === 'admin') {
+        router.push('/admin/dashboard');
+      } else {
+        router.push('/dashboard');
+      }
     } catch (error) {
       alert(error.response?.data?.message || 'Invalid credentials');
     } finally {
