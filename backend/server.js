@@ -9,6 +9,7 @@ import cartRoutes from './routes/cart.routes.js';
 import prescriptionRoutes from './routes/prescription.routes.js';
 import orderRoutes from './routes/order.routes.js';
 import storeSettingsRoutes from './routes/storeSettings.routes.js';
+import dashboardRoutes from './routes/dashboard.routes.js';
 import cookieParser from 'cookie-parser';
 import { v2 as cloudinary } from "cloudinary";
 
@@ -36,6 +37,7 @@ app.use('/api/cart', cartRoutes);
 app.use('/api/prescriptions', prescriptionRoutes);
 app.use('/api/orders', orderRoutes);
 app.use('/api/store-settings', storeSettingsRoutes);
+app.use('/api/dashboard', dashboardRoutes)
 
 
 app.listen(PORT, () => {

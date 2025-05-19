@@ -1,75 +1,110 @@
-import Order from '../models/order.model.js';
-import User from '../models/user.model.js';
-import Product from '../models/product.model.js';
-import Prescription from '../models/prescription.model.js';
+import User from '../models/user.model.js'
+import Order from '../models/order.model.js'
+import Prescription from '../models/prescription.model.js'
+import Notification from '../models/notification.model.js'
 
 export const getDashboardStats = async (req, res) => {
-    try {
-        const totalOrders = await Order.countDocuments({ user: req.user._id });
-        const pendingOrders = await Order.countDocuments({ 
-            user: req.user._id,
-            status: 'pending'
-        });
-        const activePrescriptions = await Prescription.countDocuments({
-            user: req.user._id,
-            status: 'approved',
-            expiryDate: { $gt: new Date() }
-        });
-        const lastOrder = await Order.findOne({ user: req.user._id })
-            .sort({ createdAt: -1 });
+  try {
+    const userId = req.user._id
 
-        res.status(200).json({
-            totalOrders,
-            pendingOrders,
-            activePrescriptions,
-            lastOrderDate: lastOrder?.createdAt
-        });
-    } catch (error) {
-        console.error("Error in getDashboardStats:", error);
-        res.status(500).json({ 
-            error: "Failed to fetch dashboard stats",
-            details: error.message 
-        });
+    // Get user details
+    const user = await User.findById(userId)
+
+    // Get orders statistics
+    const totalOrders = await Order.countDocuments({ user: userId })
+    const pendingOrders = await Order.countDocuments({ 
+      user: userId,
+      status: { $in: ['Processing', 'Pending'] }
+    })
+
+    // Get last order date
+    const lastOrder = await Order.findOne({ user: userId })
+      .sort({ createdAt: -1 })
+      .select('createdAt')
+
+    // Get active prescriptions count
+    const activePrescriptions = await Prescription.countDocuments({
+      user: userId,
+      status: 'Active'
+    })
+
+    res.json({
+      userName: user.fullName,
+      totalOrders: totalOrders.toString(),
+      pendingOrders: pendingOrders.toString(),
+      activePrescriptions: activePrescriptions.toString(),
+      lastOrderDate: lastOrder ? lastOrder.createdAt : null
+    })
+  } catch (error) {
+    console.error('Error fetching dashboard stats:', error)
+    res.status(500).json({ message: 'Error fetching dashboard statistics' })
+  }
+}
+
+export const getRecentNotifications = async (req, res) => {
+  try {
+    const userId = req.user._id
+    const notifications = await Notification.find({ user: userId })
+      .sort({ createdAt: -1 })
+      .limit(5)
+      .select('message createdAt')
+
+    const formattedNotifications = notifications.map(notification => ({
+      id: notification._id,
+      message: notification.message,
+      time: getTimeAgo(notification.createdAt)
+    }))
+
+    res.json(formattedNotifications)
+  } catch (error) {
+    console.error('Error fetching notifications:', error)
+    res.status(500).json({ message: 'Error fetching notifications' })
+  }
+}
+
+export const getRecentOrders = async (req, res) => {
+  try {
+    const userId = req.user._id
+    const orders = await Order.find({ user: userId })
+      .sort({ createdAt: -1 })
+      .limit(4)
+      .select('_id total status createdAt')
+
+    const formattedOrders = orders.map(order => ({
+      id: order._id,
+      date: order.createdAt,
+      status: order.status,
+      amount: order.total.toString()
+    }))
+
+    if (formattedOrders.length === 0) {
+      return res.status(404).json({ message: 'No orders found' })
     }
-};
 
-// Add admin dashboard stats
-export const getAdminDashboardStats = async (req, res) => {
-    try {
-        const totalOrders = await Order.countDocuments();
-        const pendingOrders = await Order.countDocuments({ status: 'pending' });
-        const totalUsers = await User.countDocuments();
-        const lowStockProducts = await Product.countDocuments({ stock: { $lte: 10 } });
-        
-        // Get total sales
-        const orders = await Order.find({ status: { $ne: 'cancelled' } });
-        const totalSales = orders.reduce((acc, order) => acc + order.total, 0);
+    res.json(formattedOrders)
+  } catch (error) {
+    console.error('Error fetching recent orders:', error)
+    res.status(500).json({ message: 'Error fetching recent orders' })
+  }
+}
 
-        // Get recent orders
-        const recentOrders = await Order.find()
-            .populate('user', 'name')
-            .sort({ createdAt: -1 })
-            .limit(5);
+// Helper function to format time ago
+function getTimeAgo(date) {
+  const seconds = Math.floor((new Date() - date) / 1000)
+  const intervals = [
+    { label: 'year', seconds: 31536000 },
+    { label: 'month', seconds: 2592000 },
+    { label: 'day', seconds: 86400 },
+    { label: 'hour', seconds: 3600 },
+    { label: 'minute', seconds: 60 }
+  ]
 
-        // Get low stock items
-        const lowStockItems = await Product.find({ stock: { $lte: 10 } })
-            .select('name stock')
-            .limit(5);
-
-        res.status(200).json({
-            totalSales,
-            totalOrders,
-            pendingOrders,
-            totalUsers,
-            lowStockProducts,
-            recentOrders,
-            lowStockItems
-        });
-    } catch (error) {
-        console.error("Error in getAdminDashboardStats:", error);
-        res.status(500).json({ 
-            error: "Failed to fetch admin dashboard stats",
-            details: error.message 
-        });
+  for (let i = 0; i < intervals.length; i++) {
+    const interval = intervals[i]
+    const count = Math.floor(seconds / interval.seconds)
+    if (count >= 1) {
+      return `${count} ${interval.label}${count !== 1 ? 's' : ''} ago`
     }
-};
+  }
+  return 'just now'
+}

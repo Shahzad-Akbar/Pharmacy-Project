@@ -1,305 +1,357 @@
 'use client'
-import { useState } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import Image from 'next/image'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { 
-  User, 
-  Settings, 
-  Heart, 
-  Camera, 
-  Mail, 
-  Phone, 
-  Calendar, 
-  MapPin, 
-  Shield, 
-  Activity,
-  ShoppingBag,
-  AlertCircle,
-  Contact
-} from 'lucide-react'
+import { User, Mail, MapPin, Home, Building2, MapPinned } from 'lucide-react'
+import axios from 'axios'
+import toast from 'react-hot-toast'
+
+interface UserProfile {
+  username: string
+  fullName: string
+  email: string
+  address: {
+    street: string
+    city: string
+    state: string
+    postalCode: string
+    country: string
+  }
+  profileImg: string
+}
 
 export default function ProfilePage() {
   const [isEditing, setIsEditing] = useState(false)
-  const [formData, setFormData] = useState({
-    name: 'Shahzad',
-    email: 'bads80909@gmail.com',
-    phone: '+91 9199617022',
-    address: 'D- JAHANGIRPURI, New-Delhi, Delhi',
-    dateOfBirth: '1990-01-01',
-    gender: 'Male',
-    emergencyContact: '+91 9876543210',
-    bloodGroup: 'O+',
-    allergies: 'None',
-    medicalConditions: 'None'
+  const [loading, setLoading] = useState(true)
+  const fileInputRef = useRef<HTMLInputElement>(null)
+  const [formData, setFormData] = useState<UserProfile>({
+    username: '',
+    fullName: '',
+    email: '',
+    address: {
+      street: '',
+      city: '',
+      state: '',
+      postalCode: '',
+      country: ''
+    },
+    profileImg: ''
   })
 
-  const [passwordForm, setPasswordForm] = useState({
-    currentPassword: '',
-    newPassword: '',
-    confirmPassword: ''
-  })
+  useEffect(() => {
+    fetchUserProfile()
+  }, [])
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    setIsEditing(false)
+  const fetchUserProfile = async () => {
+    try {
+      const token = localStorage.getItem('token')
+      if (!token) {
+        toast.error('Please login to view profile')
+        return
+      }
+
+      const response = await axios.get('http://localhost:5000/api/users/profile', {
+        headers: { Authorization: `Bearer ${token}` }
+      })
+      setFormData(response.data)
+      setLoading(false)
+    } catch (error) {
+      toast.error('Failed to fetch profile')
+      console.error('Error fetching profile:', error)
+      setLoading(false)
+    }
   }
 
-  const handlePasswordChange = (e: React.FormEvent) => {
+  const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+
+    // Convert image to base64 string
+    const reader = new FileReader()
+    reader.readAsDataURL(file)
+    reader.onloadend = () => {
+      const base64String = reader.result as string
+      setFormData(prev => ({
+        ...prev,
+        profileImg: base64String
+      }))
+    }
+  }
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    // Add password change logic
+    try {
+      const token = localStorage.getItem('token')
+      if (!token) {
+        toast.error('Please login to update profile')
+        return
+      }
+
+      // Send all data including the base64 image string
+      const updateData = {
+        fullName: formData.fullName,
+        profileImg: formData.profileImg,
+        address: {
+          street: formData.address.street,
+          city: formData.address.city,
+          state: formData.address.state,
+          postalCode: formData.address.postalCode,
+          country: formData.address.country
+        }
+      }
+
+      const response = await axios.put(
+        'http://localhost:5000/api/users/update-profile',
+        updateData,
+        {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
+        }
+      )
+
+      setFormData(prev => ({
+        ...prev,
+        ...response.data
+      }))
+
+      toast.success('Profile updated successfully')
+      setIsEditing(false)
+    } catch (error) {
+      toast.error('Failed to update profile')
+      console.error('Error updating profile:', error)
+    }
+  }
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-b from-cyan-50 to-blue-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+          <p className="mt-4 text-gray-600">Loading profile...</p>
+        </div>
+      </div>
+    )
   }
 
   return (
-    <div className="container mx-auto px-4 py-8 bg-cyan-50">
+    <div className="container mx-auto px-4 py-8 bg-gradient-to-b from-cyan-50 to-blue-50 min-h-screen">
       <div className="max-w-4xl mx-auto">
-        <Tabs defaultValue="profile" className="space-y-6">
-          <TabsList className="grid grid-cols-3 gap-4 bg-blue-50 p-2 rounded-lg">
-            <TabsTrigger value="profile" className="data-[state=active]:bg-cyan-400 data-[state=active]:text-white flex items-center gap-2">
-              <User size={18} />
-              Profile
-            </TabsTrigger>
-            <TabsTrigger value="medical" className="data-[state=active]:bg-cyan-400 data-[state=active]:text-white flex items-center gap-2">
-              <Heart size={18} />
-              Medical Details
-            </TabsTrigger>
-            <TabsTrigger value="security" className="data-[state=active]:bg-cyan-400 data-[state=active]:text-white flex items-center gap-2">
-              <Settings size={18} />
-              Settings
-            </TabsTrigger>
-          </TabsList>
+        <div className="bg-white rounded-xl shadow-lg p-8">
+          <div className="flex items-center justify-between mb-8">
+            <h2 className="text-3xl font-bold text-blue-800 flex items-center gap-3">
+              <User size={32} />
+              Profile Information
+            </h2>
+            <button
+              onClick={() => setIsEditing(!isEditing)}
+              className="px-6 py-2.5 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200"
+            >
+              {isEditing ? 'Cancel' : 'Edit Profile'}
+            </button>
+          </div>
 
-          <TabsContent value="profile" className="bg-white rounded-lg shadow-md p-6">
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-2xl font-bold text-blue-800 flex items-center gap-2">
-                <User size={24} />
-                Personal Information
-              </h2>
-              <button
-                onClick={() => setIsEditing(!isEditing)}
-                className="px-4 py-2 text-sm bg-blue-600 text-white rounded hover:bg-blue-700"
-              >
-                {isEditing ? 'Cancel' : 'Edit Profile'}
-              </button>
-            </div>
-
-            <div className="flex flex-col md:flex-row gap-8">
-              <div className="md:w-1/3">
-                <div className="relative w-40 h-40 mx-auto">
-                  <Image
-                    src="/logged/my-profile.png"
-                    alt="Profile"
-                    fill
-                    className="rounded-full object-cover border-4 border-blue-100"
-                  />
-                </div>
+          <div className="flex flex-col md:flex-row gap-12">
+            <div className="md:w-1/3">
+              <div className="relative w-48 h-48 mx-auto group">
+                <Image
+                  src={formData.profileImg || '/logged/my-profile.png'}
+                  alt="Profile"
+                  fill
+                  className="rounded-full object-cover border-4 border-blue-100 shadow-md"
+                />
                 {isEditing && (
-                  <button className="mt-4 w-full px-4 py-2 text-sm bg-gray-100 text-gray-700 rounded hover:bg-gray-200 flex items-center justify-center gap-2">
-                    <Camera size={18} />
-                    Change Photo
-                  </button>
-                )}
-              </div>
-
-              <div className="md:w-2/3">
-                {isEditing ? (
-                  <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                      <label className=" text-sm font-medium text-gray-700 flex items-center gap-2">
-                        <User size={16} />
-                        Name
-                      </label>
-                      <input
-                        type="text"
-                        value={formData.name}
-                        onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                        className="mt-1  w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                      />
-                    </div>
-                    <div>
-                      <label className=" text-sm font-medium text-gray-700 flex items-center gap-2">
-                        <Mail size={16} />
-                        Email
-                      </label>
-                      <input
-                        type="email"
-                        value={formData.email}
-                        onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                        className="mt-1  w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                      />
-                    </div>
-                    <div>
-                      <label className=" text-sm font-medium text-gray-700 flex items-center gap-2">
-                        <Phone size={16} />
-                        Phone
-                      </label>
-                      <input
-                        type="tel"
-                        value={formData.phone}
-                        onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                        className="mt-1  w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                      />
-                    </div>
-                    <div>
-                      <label className=" text-sm font-medium text-gray-700 flex items-center gap-2">
-                        <Calendar size={16} />
-                        Date of Birth
-                      </label>
-                      <input
-                        type="date"
-                        value={formData.dateOfBirth}
-                        onChange={(e) => setFormData({ ...formData, dateOfBirth: e.target.value })}
-                        className="mt-1  w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                      />
-                    </div>
-                    <div className="md:col-span-2">
-                      <label className=" text-sm font-medium text-gray-700 flex items-center gap-2">
-                        <MapPin size={16} />
-                        Address
-                      </label>
-                      <textarea
-                        value={formData.address}
-                        onChange={(e) => setFormData({ ...formData, address: e.target.value })}
-                        rows={3}
-                        className="mt-1  w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                      />
-                    </div>
-                    <div className="md:col-span-2">
-                      <button
-                        type="submit"
-                        className="w-full px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
-                      >
-                        Save Changes
-                      </button>
-                    </div>
-                  </form>
-                ) : (
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                      <h3 className="text-sm font-medium text-gray-800 flex items-center gap-2">
-                        <User size={16} />
-                        Name
-                      </h3>
-                      <p className="mt-1 text-lg text-green-900 pl-[20px]">{formData.name}</p>
-                    </div>
-                    <div>
-                      <h3 className="text-sm font-medium text-gray-800 flex items-center gap-2">
-                        <Mail size={16} />
-                        Email
-                      </h3>
-                      <p className="mt-1 text-lg  text-green-900 pl-[20px]">{formData.email}</p>
-                    </div>
-                    <div>
-                      <h3 className="text-sm font-medium text-gray-800 flex items-center gap-2">
-                        <Phone size={16} />
-                        Phone
-                      </h3>
-                      <p className="mt-1 text-lg  text-green-900 pl-[20px]">{formData.phone}</p>
-                    </div>
-                    <div>
-                      <h3 className="text-sm font-medium text-gray-800 flex items-center gap-2">
-                        <Calendar size={16} />
-                        Date of Birth
-                      </h3>
-                      <p className="mt-1 text-lg  text-green-900 pl-[20px]">{formData.dateOfBirth}</p>
-                    </div>
-                    <div className="md:col-span-2">
-                      <h3 className="text-sm font-medium text-gray-800 flex items-center gap-2">
-                        <MapPin size={16} />
-                        Address
-                      </h3>
-                      <p className="mt-1 text-lg  text-green-900 pl-[20px]">{formData.address}</p>
-                    </div>
+                  <div
+                    onClick={() => fileInputRef.current?.click()}
+                    className="absolute inset-0 bg-black bg-opacity-50 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200 cursor-pointer"
+                  >
+                    <span className="text-white text-sm font-medium">Change Photo</span>
                   </div>
                 )}
+
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/*"
+                  onChange={handleImageChange}
+                  className="hidden"
+                />
               </div>
             </div>
-          </TabsContent>
 
-          <TabsContent value="medical" className="bg-white rounded-lg shadow-md p-6">
-            <h2 className="text-2xl font-bold text-blue-800 mb-6 flex items-center gap-2">
-              <Activity size={24} />
-              Medical Information
-            </h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
-                <h3 className="text-sm font-medium text-gray-800 flex items-center gap-2">
-                  <Heart size={16} />
-                  Blood Group
-                </h3>
-                <p className="mt-1 text-lg  text-green-900 pl-[20px]">{formData.bloodGroup}</p>
-              </div>
-              <div>
-                <h3 className="text-sm font-medium text-gray-800 flex items-center gap-2">
-                  <Contact size={16} />
-                  Emergency Contact
-                </h3>
-                <p className="mt-1 text-lg  text-green-900 pl-[20px]">{formData.emergencyContact}</p>
-              </div>
-              <div>
-                <h3 className="text-sm font-medium text-gray-800 flex items-center gap-2">
-                  <AlertCircle size={16} />
-                  Allergies
-                </h3>
-                <p className="mt-1 text-lg  text-green-900 pl-[20px]">{formData.allergies}</p>
-              </div>
-              <div>
-                <h3 className="text-sm font-medium text-gray-800">Medical Conditions</h3>
-                <p className="mt-1 text-lg  text-green-900 pl-[20px]">{formData.medicalConditions}</p>
-              </div>
+            <div className="md:w-2/3">
+              {isEditing ? (
+                <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="col-span-2 md:col-span-1">
+                    <label className="text-sm font-medium text-gray-700 flex items-center gap-2">
+                      <User size={16} />
+                      Username
+                    </label>
+                    <input
+                      type="text"
+                      value={formData.username}
+                      disabled
+                      className="text-black mt-1 w-full rounded-lg border-gray-300 bg-gray-100 shadow-sm"
+                    />
+                  </div>
+                  <div className="col-span-2 md:col-span-1">
+                    <label className="text-sm font-medium text-gray-700 flex items-center gap-2">
+                      <User size={16} />
+                      Full Name
+                    </label>
+                    <input
+                      type="text"
+                      value={formData.fullName}
+                      onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
+                      className="text-black mt-1 w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                    />
+                  </div>
+                  <div className="col-span-2">
+                    <label className="text-sm font-medium text-gray-700 flex items-center gap-2">
+                      <Mail size={16} />
+                      Email
+                    </label>
+                    <input
+                      type="email"
+                      value={formData.email}
+                      disabled
+                      className="text-black mt-1 w-full rounded-lg border-gray-300 bg-gray-100 shadow-sm"
+                    />
+                  </div>
+
+                  <div className="col-span-2 mt-4">
+                    <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
+                      <MapPin size={20} />
+                      Address Information
+                    </h3>
+                  </div>
+
+                  <div>
+                    <label className="text-sm font-medium text-gray-700 flex items-center gap-2">
+                      <Home size={16} />
+                      Street
+                    </label>
+                    <input
+                      type="text"
+                      value={formData.address.street}
+                      onChange={(e) => setFormData({
+                        ...formData,
+                        address: { ...formData.address, street: e.target.value }
+                      })}
+                      className="text-black mt-1 w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium text-gray-700 flex items-center gap-2">
+                      <Building2 size={16} />
+                      City
+                    </label>
+                    <input
+                      type="text"
+                      value={formData.address.city}
+                      onChange={(e) => setFormData({
+                        ...formData,
+                        address: { ...formData.address, city: e.target.value }
+                      })}
+                      className="text-black mt-1 w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium text-gray-700 flex items-center gap-2">
+                      <MapPinned size={16} />
+                      State
+                    </label>
+                    <input
+                      type="text"
+                      value={formData.address.state}
+                      onChange={(e) => setFormData({
+                        ...formData,
+                        address: { ...formData.address, state: e.target.value }
+                      })}
+                      className="text-black mt-1 w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium text-gray-700">Postal Code</label>
+                    <input
+                      type="text"
+                      value={formData.address.postalCode}
+                      onChange={(e) => setFormData({
+                        ...formData,
+                        address: { ...formData.address, postalCode: e.target.value }
+                      })}
+                      className="text-black mt-1 w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                    />
+                  </div>
+                  <div className="col-span-2">
+                    <button
+                      type="submit"
+                      className="w-full px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200"
+                    >
+                      Save Changes
+                    </button>
+                  </div>
+                </form>
+              ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="col-span-2 md:col-span-1 bg-gray-50 p-4 rounded-lg">
+                    <h3 className="text-sm font-medium text-gray-700 flex items-center gap-2 mb-2">
+                      <User size={16} />
+                      Username
+                    </h3>
+                    <p className="text-lg text-blue-900">{formData.username}</p>
+                  </div>
+                  <div className="col-span-2 md:col-span-1 bg-gray-50 p-4 rounded-lg">
+                    <h3 className="text-sm font-medium text-gray-700 flex items-center gap-2 mb-2">
+                      <User size={16} />
+                      Full Name
+                    </h3>
+                    <p className="text-lg text-blue-900">{formData.fullName}</p>
+                  </div>
+                  <div className="col-span-2 bg-gray-50 p-4 rounded-lg">
+                    <h3 className="text-sm font-medium text-gray-700 flex items-center gap-2 mb-2">
+                      <Mail size={16} />
+                      Email
+                    </h3>
+                    <p className="text-lg text-blue-900">{formData.email}</p>
+                  </div>
+
+                  <div className="col-span-2 mt-4">
+                    <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
+                      <MapPin size={20} />
+                      Address Information
+                    </h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <div className="bg-gray-50 p-4 rounded-lg">
+                        <h4 className="text-sm font-medium text-gray-700 flex items-center gap-2 mb-2">
+                          <Home size={16} />
+                          Street
+                        </h4>
+                        <p className="text-lg text-blue-900">{formData.address.street}</p>
+                      </div>
+                      <div className="bg-gray-50 p-4 rounded-lg">
+                        <h4 className="text-sm font-medium text-gray-700 flex items-center gap-2 mb-2">
+                          <Building2 size={16} />
+                          City
+                        </h4>
+                        <p className="text-lg text-blue-900">{formData.address.city}</p>
+                      </div>
+                      <div className="bg-gray-50 p-4 rounded-lg">
+                        <h4 className="text-sm font-medium text-gray-700 flex items-center gap-2 mb-2">
+                          <MapPinned size={16} />
+                          State
+                        </h4>
+                        <p className="text-lg text-blue-900">{formData.address.state}</p>
+                      </div>
+                      <div className="bg-gray-50 p-4 rounded-lg">
+                        <h4 className="text-sm font-medium text-gray-700 mb-2">Postal Code</h4>
+                        <p className="text-lg text-blue-900">{formData.address.postalCode}</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
-          </TabsContent>
-
-          <TabsContent value="security" className="bg-white rounded-lg shadow-md p-6">
-            <h2 className="text-2xl font-bold text-blue-800 mb-6 flex items-center gap-2">
-              <Shield size={24} />
-              Change Password
-            </h2>
-            <form onSubmit={handlePasswordChange} className="max-w-md space-y-4">
-              <div>
-                <label className=" text-sm font-medium text-gray-700">Current Password</label>
-                <input
-                  type="password"
-                  value={passwordForm.currentPassword}
-                  onChange={(e) => setPasswordForm({ ...passwordForm, currentPassword: e.target.value })}
-                  className="mt-1  w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                />
-              </div>
-              <div>
-                <label className=" text-sm font-medium text-gray-700">New Password</label>
-                <input
-                  type="password"
-                  value={passwordForm.newPassword}
-                  onChange={(e) => setPasswordForm({ ...passwordForm, newPassword: e.target.value })}
-                  className="mt-1  w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                />
-              </div>
-              <div>
-                <label className=" text-sm font-medium text-gray-700">Confirm New Password</label>
-                <input
-                  type="password"
-                  value={passwordForm.confirmPassword}
-                  onChange={(e) => setPasswordForm({ ...passwordForm, confirmPassword: e.target.value })}
-                  className="mt-1  w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                />
-              </div>
-              <button
-                type="submit"
-                className="w-full px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
-              >
-                Update Password
-              </button>
-            </form>
-          </TabsContent>
-        </Tabs>
-
-        {/* Order History Section */}
-        <div className="bg-white rounded-lg shadow-md p-6 mt-6">
-          <h2 className="text-xl font-bold text-blue-800 mb-4 flex items-center gap-2">
-            <ShoppingBag size={24} />
-            Recent Orders
-          </h2>
-          <div className="text-gray-800 text-center py-4">
-            No orders found
           </div>
         </div>
       </div>

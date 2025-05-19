@@ -11,7 +11,7 @@ import { protectRoute } from '../middleware/protectRoute.js';
 
 const router = express.Router();
 
-router.get("/profile/:username", protectRoute, getUserProfile);
+router.get("/profile", protectRoute, getUserProfile);
 router.put("/update-profile", protectRoute, updateProfile);
 router.put("/update-password", protectRoute, updatePassword);
 router.post("/wishlist/:productId", protectRoute, addToWishlist);

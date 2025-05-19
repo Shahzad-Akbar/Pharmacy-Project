@@ -1,10 +1,11 @@
 import User from '../models/user.model.js';
 import bcrypt from 'bcryptjs';
+import {v2 as cloudinary} from 'cloudinary';
 
 export const getUserProfile = async (req, res) => {
     try {
-        const username = req.params.username;
-        const user = await User.findOne({ username }).select("-password");
+        const userId = req.user._id;
+        const user = await User.findOne(userId).select("-password");
         if (!user) return res.status(404).json({ error: "User not found" });
         res.status(200).json(user);
     } catch (error) {
@@ -15,6 +16,13 @@ export const getUserProfile = async (req, res) => {
 export const updateProfile = async (req, res) => {
     try {
         const { fullName, email, phone, address } = req.body;
+        let { profileImg } = req.body;
+
+        if (profileImg) {
+			const uploadedResponse = await cloudinary.uploader.upload(profileImg);
+			profileImg = uploadedResponse.secure_url;
+		}
+
         const user = await User.findById(req.user._id);
         
         if (!user) return res.status(404).json({ error: "User not found" });
@@ -23,6 +31,7 @@ export const updateProfile = async (req, res) => {
         user.email = email || user.email;
         user.phone = phone || user.phone;
         user.address = address || user.address;
+        user.profileImg = profileImg || user.profileImg;
 
         const updatedUser = await user.save();
         res.status(200).json({

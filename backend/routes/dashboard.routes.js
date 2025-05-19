@@ -1,10 +1,14 @@
-import express from 'express';
-import { getDashboardStats, getAdminDashboardStats } from '../controllers/dashboard.controller.js';
-import { protectRoute } from '../middleware/protectRoute.js';
+import express from 'express'
+import { protectRoute } from '../middleware/protectRoute.js'
+import {
+    getDashboardStats,
+    getRecentNotifications,
+    getRecentOrders
+} from '../controllers/dashboard.controller.js';
 
-const router = express.Router();
+const router = express.Router()
+router.get('/stats', protectRoute, getDashboardStats)
+router.get('/notifications/recent', protectRoute, getRecentNotifications)
+router.get('/orders/recent', protectRoute, getRecentOrders)
 
-router.get('/stats', protectRoute, getDashboardStats);
-router.get('/admin/stats', protectRoute, getAdminDashboardStats);
-
-export default router;
+export default router

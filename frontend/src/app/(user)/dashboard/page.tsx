@@ -18,33 +18,46 @@ export default function UserDashboard() {
     totalOrders: '0',
     pendingOrders: '0',
     activePrescriptions: '0',
-    lastOrderDate: null
+    lastOrderDate: null,
+    userName: ''
   })
 
-  const [notifications] = useState([
-    { id: 1, message: 'Your order #123 has been shipped', time: '2 hours ago' },
-    { id: 2, message: 'New products available in store', time: '5 hours ago' },
-  ])
-
-  const [recentOrders] = useState([
-    { id: '#123', date: '2024-02-20', status: 'Delivered', amount: '₹299' },
-    { id: '#124', date: '2024-02-18', status: 'Processing', amount: '₹599' },
-  ])
+  const [notifications, setNotifications] = useState([])
+  const [recentOrders, setRecentOrders] = useState([])
+  const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
-    const fetchDashboardStats = async () => {
+    const fetchDashboardData = async () => {
       try {
         const token = localStorage.getItem('token')
-        const response = await axios.get('http://localhost:5000/api/dashboard/stats', {
+        // const headers = { Authorization: `Bearer ${token}` }
+
+        // const [statsResponse, notificationsResponse, ordersResponse] = await Promise.all([
+        //   axios.get('http://localhost:5000/api/dashboard/stats', { headers }),
+        //   axios.get('http://localhost:5000/api/notifications/recent', { headers }),
+        //   axios.get('http://localhost:5000/api/orders/recent', { headers })
+        // ])
+        const statsResponse = await axios.get('http://localhost:5000/api/dashboard/stats',{
           headers: { Authorization: `Bearer ${token}` }
         })
-        setDashboardData(response.data)
+        const notificationsResponse = await axios.get('http://localhost:5000/api/dashboard/notifications/recent',{
+          headers: { Authorization: `Bearer ${token}` }
+        })
+        const ordersResponse = await axios.get('http://localhost:5000/api/dashboard/orders/recent',{
+          headers: { Authorization: `Bearer ${token}`}
+        })
+
+        setDashboardData(statsResponse.data);
+        setNotifications(notificationsResponse.data)
+        setRecentOrders(ordersResponse.data)
       } catch (error) {
-        console.error('Failed to fetch dashboard stats:', error)
+        console.error('Failed to fetch dashboard data:', error)
+      } finally {
+        setIsLoading(false)
       }
     }
 
-    fetchDashboardStats()
+    fetchDashboardData()
   }, [])
 
   const quickActions = [
@@ -61,12 +74,20 @@ export default function UserDashboard() {
     { icon: AlertCircle, label: 'Active Prescriptions', value: dashboardData.activePrescriptions }
   ]
 
+  if (isLoading) {
+    return (
+      <div className="container mx-auto px-4 py-8 flex items-center justify-center min-h-screen bg-cyan-200">
+        <div className="text-xl text-blue-600">Loading...</div>
+      </div>
+    )
+  }
+
   return (
     <div className="container mx-auto px-4 py-8 bg-cyan-200">
       <div className="max-w-6xl mx-auto space-y-6">
         {/* Welcome Section */}
         <div className="bg-gradient-to-r from-blue-500 to-cyan-400 rounded-lg p-6 text-white">
-          <h1 className="text-2xl font-bold">Welcome back, Shahzad!</h1>
+          <h1 className="text-2xl font-bold">Welcome back, {dashboardData.userName || 'User'}!</h1>
           <p className="mt-2 opacity-90">Here&apos;s what&apos;s happening with your pharmacy account.</p>
         </div>
 
@@ -111,18 +132,22 @@ export default function UserDashboard() {
               </Link>
             </div>
             <div className="space-y-4">
-              {recentOrders.map((order) => (
-                <div key={order.id} className="flex items-center justify-between p-3 bg-gray-50 rounded">
-                  <div>
-                    <span className="font-medium text-gray-800">{order.id}</span>
-                    <p className="text-sm text-gray-500">{order.date}</p>
+              {recentOrders.length > 0 ? (
+                recentOrders.map((order) => (
+                  <div key={order.id} className="flex items-center justify-between p-3 bg-gray-50 rounded">
+                    <div>
+                      <span className="font-medium text-gray-800">{order.id}</span>
+                      <p className="text-sm text-gray-500">{new Date(order.date).toLocaleDateString()}</p>
+                    </div>
+                    <div className="text-right">
+                      <span className="font-medium text-gray-800">₹{order.amount}</span>
+                      <p className="text-sm text-gray-500">{order.status}</p>
+                    </div>
                   </div>
-                  <div className="text-right">
-                    <span className="font-medium text-gray-800">{order.amount}</span>
-                    <p className="text-sm text-gray-500">{order.status}</p>
-                  </div>
-                </div>
-              ))}
+                ))
+              ) : (
+                <div className="text-center text-gray-500 py-4">No recent orders</div>
+              )}
             </div>
           </div>
 
@@ -138,12 +163,16 @@ export default function UserDashboard() {
               </Link>
             </div>
             <div className="space-y-4">
-              {notifications.map((notification) => (
-                <div key={notification.id} className="p-3 bg-gray-50 rounded">
-                  <p className="text-gray-800">{notification.message}</p>
-                  <p className="text-sm text-gray-500 mt-1">{notification.time}</p>
-                </div>
-              ))}
+              {notifications.length > 0 ? (
+                notifications.map((notification) => (
+                  <div key={notification.id} className="p-3 bg-gray-50 rounded">
+                    <p className="text-gray-800">{notification.message}</p>
+                    <p className="text-sm text-gray-500 mt-1">{notification.time}</p>
+                  </div>
+                ))
+              ) : (
+                <div className="text-center text-gray-500 py-4">No new notifications</div>
+              )}
             </div>
           </div>
         </div>
