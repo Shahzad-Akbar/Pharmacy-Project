@@ -131,9 +131,9 @@ export default function CheckoutPage() {
       if (response.data) {
         toast.success('Order placed successfully!')
         // Clear cart after successful order
-        // await axios.post('http://localhost:5000/api/cart/clear', {}, {
-        //   headers: { Authorization: `Bearer ${token}` }
-        // })
+        await axios.delete('http://localhost:5000/api/cart/clear',{
+          headers: { Authorization: `Bearer ${token}` }
+        })
         router.push('/orders')
       }
     } catch (error) {

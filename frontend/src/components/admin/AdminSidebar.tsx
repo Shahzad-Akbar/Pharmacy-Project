@@ -19,12 +19,13 @@ export default function AdminSidebar() {
     { icon: Package, label: 'Products', href: '/admin/product' },
     { icon: ShoppingCart, label: 'Orders', href: '/admin/orders' },
     { icon: Users, label: 'Users', href: '/admin/users' },
-    { icon: FileText, label: 'Reports', href: '/admin/reports' },
+    { icon: FileText, label: 'Inventory', href: '/admin/inventory' },
     { icon: Settings, label: 'Settings', href: '/admin/settings' }
   ]
 
   const handleLogout = () => {
     localStorage.removeItem('token')
+    localStorage.removeItem('role')
     window.location.href = '/login'
   }
 

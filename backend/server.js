@@ -10,6 +10,7 @@ import prescriptionRoutes from './routes/prescription.routes.js';
 import orderRoutes from './routes/order.routes.js';
 import storeSettingsRoutes from './routes/storeSettings.routes.js';
 import dashboardRoutes from './routes/dashboard.routes.js';
+import inventoryRoutes from './routes/inventory.routes.js';
 import cookieParser from 'cookie-parser';
 import { v2 as cloudinary } from "cloudinary";
 
@@ -38,7 +39,7 @@ app.use('/api/prescriptions', prescriptionRoutes);
 app.use('/api/orders', orderRoutes);
 app.use('/api/store-settings', storeSettingsRoutes);
 app.use('/api/dashboard', dashboardRoutes)
-
+app.use('/api/inventory', inventoryRoutes);
 
 app.listen(PORT, () => {
   connectMongoDB();
