@@ -10,7 +10,8 @@ import {
   Users,
   PackageCheck,
   Boxes,
-  Settings
+  Settings,
+  PillBottle
 } from 'lucide-react'
 import { toast } from 'react-hot-toast'
 
@@ -232,6 +233,12 @@ export default function AdminDashboard() {
         className="p-4 bg-white rounded-lg shadow-sm hover:shadow-xl transition-shadow">
           <Boxes className="mx-auto mb-2 text-cyan-600" size={24} />
           <p className="text-sm text-center text-gray-800">Products</p>
+        </button>
+        <button 
+        onClick={() => {window.location.href = '/admin/prescriptions';}}
+        className="p-4 bg-white rounded-lg shadow-sm hover:shadow-xl transition-shadow">
+          <PillBottle className="mx-auto mb-2 text-cyan-600" size={24} />
+          <p className="text-sm text-center text-gray-800">User&apos;s Prescriptions</p>
         </button>
         <button 
         onClick={() => {window.location.href = '/admin/settings';}}

@@ -100,3 +100,54 @@ export const verifyPrescription = async (req, res) => {
         res.status(500).json({ error: error.message });
     }
 };
+
+// Get all prescriptions (Admin only)
+export const getAllPrescriptions = async (req, res) => {
+    try {
+        const { status, doctorName, startDate, endDate, verificationStatus } = req.query;
+
+        // Build filter object
+        const filter = {};
+
+        // Add status filter
+        if (status) {
+            filter.status = status;
+        }
+
+        // Add doctor name filter (case-insensitive)
+        if (doctorName) {
+            filter.doctorName = { $regex: doctorName, $options: 'i' };
+        }
+
+        // Add date range filter
+        if (startDate || endDate) {
+            filter.createdAt = {};
+            if (startDate) {
+                filter.createdAt.$gte = new Date(startDate);
+            }
+            if (endDate) {
+                filter.createdAt.$lte = new Date(endDate);
+            }
+        }
+
+        // Add verification status filter
+        if (verificationStatus) {
+            if (verificationStatus === 'verified') {
+                filter.verifiedBy = { $ne: null };
+            } else if (verificationStatus === 'unverified') {
+                filter.verifiedBy = null;
+            }
+        }
+
+        const prescriptions = await Prescription.find(filter)
+            .populate('user', 'username email')
+            .populate('products', 'name price stock') // Add relevant product fields
+            .populate('verifiedBy', 'username')
+            .sort({ createdAt: -1 });
+
+        res.status(200).json(prescriptions);
+    } catch (error) {
+        console.error('Error fetching prescriptions:', error);
+        res.status(500).json({ error: 'Failed to fetch prescriptions' });
+    }
+};
