@@ -1,37 +1,98 @@
 'use client'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import axios from 'axios'
 import {
-  Package,
-  PackageCheck,
-  Boxes,
-  Users,
-  FileText,
-  Settings,
   Bell,
   TrendingUp,
   AlertCircle,
   ShoppingCart,
+  Package,
+  Users,
+  PackageCheck,
+  Boxes,
+  Settings
 } from 'lucide-react'
+import { toast } from 'react-hot-toast'
+
+interface DashboardStats {
+  totalSales: string
+  totalOrders: string
+  pendingOrders: string
+  lowStock: string
+}
+
+interface RecentOrder {
+  id: string
+  customer: string
+  status: string
+  amount: string
+  date: string
+}
+
+interface LowStockItem {
+  id: string
+  name: string
+  price: string
+  category: string
+  stock: string
+  expiryDate: string
+}
 
 export default function AdminDashboard() {
-  const [stats] = useState({
-    totalSales: '₹45,678',
-    totalOrders: '156',
-    pendingOrders: '23',
-    lowStock: '8'
+  const [stats, setStats] = useState<DashboardStats>({
+    totalSales: '₹0',
+    totalOrders: '0',
+    pendingOrders: '0',
+    lowStock: '0'
   })
 
-  const [recentOrders] = useState([
-    { id: '#123', customer: 'John Doe', status: 'Processing', amount: '₹299' },
-    { id: '#124', customer: 'Jane Smith', status: 'Delivered', amount: '₹599' },
-    { id: '#125', customer: 'Mike Johnson', status: 'Pending', amount: '₹199' }
-  ])
+  const [recentOrders, setRecentOrders] = useState<RecentOrder[]>([])
+  const [lowStockItems, setLowStockItems] = useState<LowStockItem[]>([])
+  const [loading, setLoading] = useState(true)
 
-  const [lowStockItems] = useState([
-    { name: 'Paracetamol 500mg', stock: '10', reorderPoint: '20' },
-    { name: 'Vitamin C 1000mg', stock: '5', reorderPoint: '15' },
-    { name: 'Aspirin 300mg', stock: '8', reorderPoint: '25' }
-  ])
+  useEffect(() => {
+    fetchDashboardData()
+  }, [])
+
+  const fetchDashboardData = async () => {
+    const token = localStorage.getItem('token')
+    try {
+      setLoading(true)
+      
+      // Fetch dashboard stats
+      const statsResponse = await axios.get('http://localhost:5000/api/dashboard/admin/stats', {
+        headers: { Authorization: `Bearer ${token}` }
+      })
+      setStats(statsResponse.data)
+  
+      try {
+        // Fetch recent orders - handle empty state gracefully
+        const ordersResponse = await axios.get('http://localhost:5000/api/dashboard/admin/recent-order', {
+          headers: { Authorization: `Bearer ${token}` }
+        })
+        setRecentOrders(ordersResponse.data)
+      } catch (orderError) {
+       console.log('Error fetching recent orders:', orderError)
+        setRecentOrders([])
+      }
+  
+      // Fetch notifications
+      const notificationsResponse = await axios.get('http://localhost:5000/api/dashboard/admin/low-stock', {
+        headers: { Authorization: `Bearer ${token}` }
+      })
+
+      setLowStockItems(notificationsResponse.data)  
+    } catch (error) {
+      console.error('Error fetching dashboard data:', error)
+      toast.error('Failed to fetch dashboard data')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  if (loading) {
+    return <div className="flex items-center justify-center h-screen">Loading...</div>
+  }
 
   return (
     <div className="p-6 bg-blue-100 min-h-screen">
@@ -94,21 +155,22 @@ export default function AdminDashboard() {
           </div>
           <div className="p-6">
             <div className="space-y-4">
-              {recentOrders.map((order) => (
-                <div key={order.id} className="flex items-center justify-between">
-                  <div>
-                    <p className="font-medium text-gray-800">{order.customer}</p>
-                    <p className="text-sm text-gray-500">{order.id}</p>
+            {recentOrders.length > 0 ? (
+                recentOrders.map((order) => (
+                  <div key={order.id} className="flex items-center justify-between p-3 bg-gray-50 rounded">
+                    <div>
+                      <span className="font-medium text-gray-800">{order.id}</span>
+                      <p className="text-sm text-gray-500">{new Date(order.date).toLocaleDateString()}</p>
+                    </div>
+                    <div className="text-right">
+                      <span className="font-medium text-gray-800">₹{order.amount}</span>
+                      <p className="text-sm text-gray-500">{order.status}</p>
+                    </div>
                   </div>
-                  <div className="text-right">
-                    <p className="font-medium text-gray-800">{order.amount}</p>
-                    <p className={`text-sm ${
-                      order.status === 'Delivered' ? 'text-green-600' :
-                      order.status === 'Processing' ? 'text-blue-600' : 'text-yellow-600'
-                    }`}>{order.status}</p>
-                  </div>
-                </div>
-              ))}
+                ))
+              ) : (
+                <div className="text-center text-gray-500 py-4">No recent orders</div>
+              )}
             </div>
           </div>
         </div>
@@ -120,17 +182,26 @@ export default function AdminDashboard() {
           </div>
           <div className="p-6">
             <div className="space-y-4">
-              {lowStockItems.map((item) => (
-                <div key={item.name} className="flex items-center justify-between">
-                  <div>
-                    <p className="font-medium text-gray-800">{item.name}</p>
-                    <p className="text-sm text-gray-500">Reorder Point: {item.reorderPoint}</p>
+            {lowStockItems.length > 0 ? (
+                lowStockItems.map((items) => (
+                  <div key={items.id} className="flex items-center justify-between p-3 bg-gray-50 rounded">
+                    <div>
+                      <span className="font-medium text-gray-800">{items.name}</span>
+                      <p className="text-sm text-gray-500">{new Date(items.expiryDate).toLocaleDateString()}</p>
+                    </div>
+                    <div className="text-right">
+                      <span className="font-medium text-gray-800">₹{items.price}</span>
+                      <p className="text-sm text-gray-500">{items.category}</p>
+                    </div>
+                    <div className="text-right">
+                    <span className="font-medium text-gray-800">Stock</span>
+                    <p className="text-sm text-gray-500">{items.stock}</p>
+                    </div>
                   </div>
-                  <div className="text-right">
-                    <p className="font-medium text-red-600">{item.stock} left</p>
-                  </div>
-                </div>
-              ))}
+                ))
+              ) : (
+                <div className="text-center text-gray-500 py-4">No sotck orders</div>
+              )}
             </div>
           </div>
         </div>
@@ -161,12 +232,6 @@ export default function AdminDashboard() {
         className="p-4 bg-white rounded-lg shadow-sm hover:shadow-xl transition-shadow">
           <Boxes className="mx-auto mb-2 text-cyan-600" size={24} />
           <p className="text-sm text-center text-gray-800">Products</p>
-        </button>
-        <button 
-        onClick={() => {window.location.href = '/admin/report';}}
-        className="p-4 bg-white rounded-lg shadow-sm hover:shadow-xl transition-shadow">
-          <FileText className="mx-auto mb-2 text-yellow-600" size={24} />
-          <p className="text-sm text-center text-gray-800">Reports</p>
         </button>
         <button 
         onClick={() => {window.location.href = '/admin/settings';}}

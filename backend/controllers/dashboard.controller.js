@@ -1,5 +1,6 @@
 import User from '../models/user.model.js'
 import Order from '../models/order.model.js'
+import Product from '../models/product.model.js'
 import Prescription from '../models/prescription.model.js'
 import Notification from '../models/notification.model.js'
 
@@ -107,4 +108,84 @@ function getTimeAgo(date) {
     }
   }
   return 'just now'
+}
+
+//Admin Dashboard Stats
+export const getAdminDashboardStats = async (req, res) => {
+  try {
+    // Remove user filtering to get all orders for admin dashboard
+    const totalOrders = await Order.countDocuments({})
+
+    const pendingOrders = await Order.countDocuments({ 
+      status: { $in: ['pending', 'processing'] }
+    })
+
+    // Calculate total sales from delivered orders only
+    const deliveredOrders = await Order.find({ status: 'delivered' })
+    const totalSales = deliveredOrders.reduce((sum, order) => sum + (order.total || 0), 0)
+
+    // Get low stock products count (less than 10 items)
+    const threshold = parseInt(req.query.threshold) || 10;
+    const products = await Product.find({ stock: { $lte: threshold } });
+    const lowStockCount = products.length;
+
+    res.json({
+      totalSales: `₹${totalSales.toFixed(2)}`,
+      totalOrders: totalOrders.toString(),
+      pendingOrders: pendingOrders.toString(),
+      lowStock: lowStockCount.toString()
+    })
+  } catch (error) {
+    console.error('Error fetching dashboard stats:', error)
+    res.status(500).json({ message: 'Error fetching dashboard statistics' })
+  }
+}
+
+//Admin Low Stock Products
+export const getLowStockProducts = async (req, res) => {
+  try {
+    const threshold = parseInt(req.query.threshold) || 10;
+    const products = await Product.find({ stock: { $lte: threshold } });
+
+    if (products.length === 0) {
+      return res.status(404).json({ message: 'No low stock products found' })
+    }
+    const formattedProducts = products.map(product => ({
+      id: product._id,
+      name: product.name,
+      price: product.price.toString(),
+      category: product.category,
+      stock: product.stock.toString() ,
+      expiryDate: product.expiryDate
+    }))
+    res.json(formattedProducts)
+  }catch (error) {
+    console.error('Error fetching low stock products:', error)
+    res.status(500).json({ message: 'Error fetching low stock products' })
+  }
+}
+
+//Admin Recent Orders
+export const getRecentAdminOrders = async (req, res) => {
+  try {
+    const orders = await Order.find({})
+     .sort({ createdAt: -1 })
+     .limit(4)
+     .select('_id total status createdAt')
+
+    const formattedOrders = orders.map(order => ({
+      id: order._id,
+      date: order.createdAt,
+      status: order.status,
+      amount: order.total.toString()
+    }))
+
+    if (formattedOrders.length === 0) {
+      return res.status(404).json({ message: 'No orders found' })
+    }
+
+    res.json(formattedOrders)
+  } catch (error) {
+    console.error('Error fetching recent orders:', error)
+    res.status(500).json({ message: 'Error fetching recent orders' })}
 }

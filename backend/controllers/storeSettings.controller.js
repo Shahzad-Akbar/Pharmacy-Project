@@ -3,9 +3,14 @@ import StoreSetting from '../models/storeSettings.model.js';
 // Get store settings
 export const getStoreSettings = async (req, res) => {
     try {
-        const settings = await StoreSetting.findOne();
+        let settings = await StoreSetting.findOne();
         if (!settings) {
-            return res.status(404).json({ error: "Store settings not found" });
+            // Create default settings if none exist
+            settings = new StoreSetting({
+                name: 'My Pharmacy',
+                email: 'pharmacy@example.com'
+            });
+            await settings.save();
         }
         res.status(200).json(settings);
     } catch (error) {
@@ -25,16 +30,13 @@ export const updateStoreSettings = async (req, res) => {
             currency 
         } = req.body;
 
+        if (!name || !email) {
+            return res.status(400).json({ error: 'Name and email are required' });
+        }
+
         let settings = await StoreSetting.findOne();
 
-        if (settings) {
-            settings.name = name || settings.name;
-            settings.email = email || settings.email;
-            settings.phone = phone || settings.phone;
-            settings.address = address || settings.address;
-            settings.taxRate = taxRate || settings.taxRate;
-            settings.currency = currency || settings.currency;
-        } else {
+        if (!settings) {
             settings = new StoreSetting({
                 name,
                 email,
@@ -43,6 +45,13 @@ export const updateStoreSettings = async (req, res) => {
                 taxRate,
                 currency
             });
+        } else {
+            settings.name = name;
+            settings.email = email;
+            settings.phone = phone || settings.phone;
+            settings.address = address || settings.address;
+            settings.taxRate = taxRate || settings.taxRate;
+            settings.currency = currency || settings.currency;
         }
 
         await settings.save();
@@ -65,17 +74,26 @@ export const updateDeliverySettings = async (req, res) => {
 
         let settings = await StoreSetting.findOne();
         if (!settings) {
-            return res.status(404).json({ error: "Store settings not found" });
+            settings = new StoreSetting({
+                name: 'My Pharmacy',
+                email: 'pharmacy@example.com',
+                deliverySettings: {
+                    enableDelivery,
+                    deliveryRadius,
+                    minimumOrder,
+                    deliveryFee,
+                    freeDeliveryAbove
+                }
+            });
+        } else {
+            settings.deliverySettings = {
+                enableDelivery: enableDelivery !== undefined ? enableDelivery : settings.deliverySettings.enableDelivery,
+                deliveryRadius: deliveryRadius !== undefined ? deliveryRadius : settings.deliverySettings.deliveryRadius,
+                minimumOrder: minimumOrder !== undefined ? minimumOrder : settings.deliverySettings.minimumOrder,
+                deliveryFee: deliveryFee !== undefined ? deliveryFee : settings.deliverySettings.deliveryFee,
+                freeDeliveryAbove: freeDeliveryAbove !== undefined ? freeDeliveryAbove : settings.deliverySettings.freeDeliveryAbove
+            };
         }
-
-        settings.deliverySettings = {
-            ...settings.deliverySettings,
-            enableDelivery: enableDelivery !== undefined ? enableDelivery : settings.deliverySettings.enableDelivery,
-            deliveryRadius: deliveryRadius || settings.deliverySettings.deliveryRadius,
-            minimumOrder: minimumOrder || settings.deliverySettings.minimumOrder,
-            deliveryFee: deliveryFee || settings.deliverySettings.deliveryFee,
-            freeDeliveryAbove: freeDeliveryAbove || settings.deliverySettings.freeDeliveryAbove
-        };
 
         await settings.save();
         res.status(200).json(settings);
@@ -96,16 +114,24 @@ export const updatePaymentSettings = async (req, res) => {
 
         let settings = await StoreSetting.findOne();
         if (!settings) {
-            return res.status(404).json({ error: "Store settings not found" });
+            settings = new StoreSetting({
+                name: 'My Pharmacy',
+                email: 'pharmacy@example.com',
+                paymentSettings: {
+                    enableCashOnDelivery,
+                    enableOnlinePayment,
+                    merchantId,
+                    apiKey
+                }
+            });
+        } else {
+            settings.paymentSettings = {
+                enableCashOnDelivery: enableCashOnDelivery !== undefined ? enableCashOnDelivery : settings.paymentSettings.enableCashOnDelivery,
+                enableOnlinePayment: enableOnlinePayment !== undefined ? enableOnlinePayment : settings.paymentSettings.enableOnlinePayment,
+                merchantId: merchantId || settings.paymentSettings.merchantId,
+                apiKey: apiKey || settings.paymentSettings.apiKey
+            };
         }
-
-        settings.paymentSettings = {
-            ...settings.paymentSettings,
-            enableCashOnDelivery: enableCashOnDelivery !== undefined ? enableCashOnDelivery : settings.paymentSettings.enableCashOnDelivery,
-            enableOnlinePayment: enableOnlinePayment !== undefined ? enableOnlinePayment : settings.paymentSettings.enableOnlinePayment,
-            merchantId: merchantId || settings.paymentSettings.merchantId,
-            apiKey: apiKey || settings.paymentSettings.apiKey
-        };
 
         await settings.save();
         res.status(200).json(settings);
