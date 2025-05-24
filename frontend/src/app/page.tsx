@@ -5,100 +5,161 @@ import Footer from '@/components/shared/Footer'
 
 export default function Home() {
   return (
-    <div className="min-h-screen bg-teal-50">
+    <div className="min-h-screen bg-gradient-to-b from-teal-50 to-white">
       <Navbar />
       
       {/* Hero Section */}
-      <section className="container mx-auto px-6 py-12 flex items-center">
-        <div className="w-1/2 pr-12">
-          <h1 className="text-5xl font-bold text-black mb-6">
-            Your Trusted Pharmacy
-          </h1>
-          <p className="text-gray-600 text-lg mb-8">
-            We provide a wide range of prescription and over-the-counter medications, 
-            along with expert advice and personalized care to meet your health needs.
-          </p>
-          <Link 
-            href="/products" 
-            className="bg-blue-300 hover:bg-blue-500 text-white px-6 py-3 rounded-2xl text-lg font-medium"
-          >
-            SHOP NOW
-          </Link>
-        </div>
-        <div className="w-1/2">
-          <Image
-            src="/images/pharmist.png"
-            alt="Professional Pharmacist"
-            width={600}
-            height={600}
-            className="rounded-lg"
-          />
+      <section className="container mx-auto px-4 sm:px-6 py-8 sm:py-16">
+        <div className="flex flex-col md:flex-row items-center gap-8 md:gap-12">
+          <div className="w-full md:w-1/2 text-center md:text-left">
+            <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold text-gray-800 mb-4 sm:mb-6 leading-tight">
+              Your Health, <span className="text-emerald-600">Our Priority</span>
+            </h1>
+            <p className="text-gray-600 text-lg sm:text-xl mb-6 sm:mb-8 leading-relaxed">
+              Experience modern healthcare solutions with our comprehensive range of services. 
+              Your wellness journey starts here with trusted pharmaceutical care.
+            </p>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center md:justify-start">
+              <Link 
+                href="/signup" 
+                className="bg-emerald-600 hover:bg-emerald-700 text-white px-6 sm:px-8 py-3 sm:py-4 rounded-full text-lg font-medium transition-all transform hover:scale-105 hover:shadow-lg w-full sm:w-auto text-center"
+              >
+                Get Started
+              </Link>
+              <Link 
+                href="/login" 
+                className="bg-white hover:bg-gray-50 text-emerald-600 border-2 border-emerald-600 px-6 sm:px-8 py-3 sm:py-4 rounded-full text-lg font-medium transition-all transform hover:scale-105 hover:shadow-lg w-full sm:w-auto text-center"
+              >
+                Browse Products
+              </Link>
+            </div>
+          </div>
+          <div className="w-full md:w-1/2 relative px-4 sm:px-0">
+            <div className="absolute -top-4 -left-4 w-48 sm:w-72 h-48 sm:h-72 bg-emerald-100 rounded-full filter blur-3xl opacity-70 animate-pulse"></div>
+            <div className="absolute -bottom-4 -right-4 w-48 sm:w-72 h-48 sm:h-72 bg-teal-100 rounded-full filter blur-3xl opacity-70 animate-pulse"></div>
+            <Image
+              src="/images/pharmist.png"
+              alt="Professional Pharmacist"
+              width={600}
+              height={600}
+              className="rounded-2xl shadow-2xl relative z-10 transform hover:scale-105 transition-transform duration-300 w-full h-auto"
+              priority
+            />
+          </div>
         </div>
       </section>
-     {/* card-section */}
-     <section className="container mx-auto px-6 py-16">
-        <h2 className="text-2xl font-bold text-black mb-8">Featured Products</h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          {/* Product Card 1 */}
-          <div className="bg-white rounded-lg shadow-md overflow-hidden">
-            <div className="h-64 relative">
+
+      {/* Features Section */}
+      <section className="bg-gradient-to-r from-emerald-50 to-teal-50 py-12 sm:py-20">
+        <div className="container mx-auto px-4 sm:px-6">
+          <h2 className="text-3xl sm:text-4xl font-bold text-center text-gray-800 mb-8 sm:mb-16">Why Choose Us?</h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-12">
+            <div className="bg-white p-6 sm:p-8 rounded-2xl shadow-lg hover:shadow-xl transition-all transform hover:-translate-y-2">
+              <div className="bg-emerald-100 w-14 h-14 sm:w-16 sm:h-16 rounded-full flex items-center justify-center mb-6">
+                <span className="text-2xl sm:text-3xl">🔒</span>
+              </div>
+              <h3 className="text-xl font-semibold text-gray-800 mb-4">Secure Prescriptions</h3>
+              <p className="text-gray-600">Your prescriptions are handled with the utmost security and privacy, ensuring safe and confidential healthcare.</p>
+            </div>
+            <div className="bg-white p-6 sm:p-8 rounded-2xl shadow-lg hover:shadow-xl transition-all transform hover:-translate-y-2">
+              <div className="bg-emerald-100 w-14 h-14 sm:w-16 sm:h-16 rounded-full flex items-center justify-center mb-6">
+                <span className="text-2xl sm:text-3xl">⚡</span>
+              </div>
+              <h3 className="text-xl font-semibold text-gray-800 mb-4">Fast Delivery</h3>
+              <p className="text-gray-600">Get your medications delivered quickly and safely to your doorstep, with real-time tracking and updates.</p>
+            </div>
+            <div className="bg-white p-6 sm:p-8 rounded-2xl shadow-lg hover:shadow-xl transition-all transform hover:-translate-y-2">
+              <div className="bg-emerald-100 w-14 h-14 sm:w-16 sm:h-16 rounded-full flex items-center justify-center mb-6">
+                <span className="text-2xl sm:text-3xl">👨‍⚕️</span>
+              </div>
+              <h3 className="text-xl font-semibold text-gray-800 mb-4">Expert Care</h3>
+              <p className="text-gray-600">Access to professional pharmacists 24/7 for personalized consultations and medication guidance.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Featured Products */}
+      <section className="container mx-auto px-4 sm:px-6 py-12 sm:py-20">
+        <div className="flex flex-col sm:flex-row justify-between items-center mb-8 sm:mb-12 gap-4">
+          <h2 className="text-3xl sm:text-4xl font-bold text-gray-800">Featured Products</h2>
+          <Link 
+            href="/login"
+            className="text-emerald-600 hover:text-emerald-700 font-medium flex items-center gap-2 group"
+          >
+            View All <span className="transform transition-transform group-hover:translate-x-1">→</span>
+          </Link>
+        </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
+          <div className="bg-white rounded-2xl shadow-lg overflow-hidden group hover:shadow-xl transition-all">
+            <div className="h-48 sm:h-64 relative overflow-hidden">
               <Image
                 src="/landing/multivitamin.jpeg"
                 alt="Multivitamin Complex"
                 fill
-                className="object-cover"
+                className="object-cover group-hover:scale-110 transition-transform duration-300"
               />
             </div>
-            <div className="p-6">
-              <h3 className="text-lg font-semibold text-cyan-500 mb-2">Multivitamin Complex</h3>
-              <p className="text-gray-600 mb-4">Support your daily nutritional needs with our comprehensive multivitamin formula</p>
+            <div className="p-4 sm:p-6">
+              <h3 className="text-xl font-semibold text-gray-800 mb-2">Multivitamin Complex</h3>
+              <p className="text-gray-600 mb-4">Complete daily nutrition in one tablet</p>
+              <div className="flex justify-between items-center mb-4">
+                <span className="text-xl sm:text-2xl font-bold text-emerald-600">24.99</span>
+                <span className="bg-emerald-100 text-emerald-800 px-3 py-1 rounded-full text-sm">Best Seller</span>
+              </div>
               <Link 
-                href="/products/multivitamin"
-                className="bg-blue-300 hover:bg-blue-500 text-white px-4 py-2 rounded inline-block hover:bg-opacity-90"
+                href="/login"
+                className="bg-emerald-600 hover:bg-emerald-700 text-white px-4 sm:px-6 py-3 rounded-full inline-block transition-colors w-full text-center touch-manipulation"
               >
                 Shop Now
               </Link>
             </div>
           </div>
 
-          {/* Product Card 2 */}
-          <div className="bg-white rounded-lg shadow-md overflow-hidden">
-            <div className="h-64 relative">
+          <div className="bg-white rounded-2xl shadow-lg overflow-hidden group hover:shadow-xl transition-all">
+            <div className="h-48 sm:h-64 relative overflow-hidden">
               <Image
                 src="/landing/allergy-relief.jpeg"
-                alt="Allergy Relief Tablets"
+                alt="Allergy Relief Medicine"
                 fill
-                className="object-cover"
+                className="object-cover group-hover:scale-110 transition-transform duration-300"
               />
             </div>
-            <div className="p-6">
-              <h3 className="text-lg font-semibold text-cyan-500 mb-2">Allergy Relief Tablets</h3>
-              <p className="text-gray-600 mb-4">Relieve seasonal allergy symptoms with our effective allergy relief tablets</p>
+            <div className="p-4 sm:p-6">
+              <h3 className="text-xl font-semibold text-gray-800 mb-2">Allergy Relief</h3>
+              <p className="text-gray-600 mb-4">24-hour allergy symptom relief</p>
+              <div className="flex justify-between items-center mb-4">
+                <span className="text-xl sm:text-2xl font-bold text-emerald-600">19.99</span>
+                <span className="bg-emerald-100 text-emerald-800 px-3 py-1 rounded-full text-sm">New Arrival</span>
+              </div>
               <Link 
-                href="/products/allergy-relief"
-                className="bg-blue-300 hover:bg-blue-500 text-white px-4 py-2 rounded inline-block hover:bg-opacity-90"
+                href="/login"
+                className="bg-emerald-600 hover:bg-emerald-700 text-white px-4 sm:px-6 py-3 rounded-full inline-block transition-colors w-full text-center touch-manipulation"
               >
                 Shop Now
               </Link>
             </div>
           </div>
 
-          {/* Product Card 3 */}
-          <div className="bg-white rounded-lg shadow-md overflow-hidden">
-            <div className="h-64 relative">
+          <div className="bg-white rounded-2xl shadow-lg overflow-hidden group hover:shadow-xl transition-all">
+            <div className="h-48 sm:h-64 relative overflow-hidden">
               <Image
                 src="/landing/first-kit.jpeg"
-                alt="Complete First Aid Kit"
+                alt="First Aid Kit"
                 fill
-                className="object-cover"
+                className="object-cover group-hover:scale-110 transition-transform duration-300"
               />
             </div>
-            <div className="p-6">
-              <h3 className="text-lg font-semibold text-cyan-500 mb-2">Complete First Aid Kit</h3>
-              <p className="text-gray-600 mb-4">Be prepared for any minor injury with our complete and portable first aid kit</p>
+            <div className="p-4 sm:p-6">
+              <h3 className="text-xl font-semibold text-gray-800 mb-2">First Aid Kit</h3>
+              <p className="text-gray-600 mb-4">Complete emergency care package</p>
+              <div className="flex justify-between items-center mb-4">
+                <span className="text-xl sm:text-2xl font-bold text-emerald-600">34.99</span>
+                <span className="bg-emerald-100 text-emerald-800 px-3 py-1 rounded-full text-sm">Essential</span>
+              </div>
               <Link 
-                href="/products/first-aid-kit"
-                className="bg-blue-300 hover:bg-blue-500 text-white px-4 py-2 rounded inline-block hover:bg-opacity-90"
+                href="/login"
+                className="bg-emerald-600 hover:bg-emerald-700 text-white px-4 sm:px-6 py-3 rounded-full inline-block transition-colors w-full text-center touch-manipulation"
               >
                 Shop Now
               </Link>
@@ -107,116 +168,138 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Featured Services */}
-      <section className="py-16">
-        <div className="container mx-auto px-6">
-          <h2 className="text-3xl font-bold text-black mb-12">Featured Services</h2>
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-            {/* Service 1 */}
-            <div className="text-center p-6">
-              <div className="text-primary text-5xl mb-4">⚕️</div>
-              <h3 className="text-xl font-semibold text-green-700 mb-3">
-                Prescription Services
-              </h3>
-              <p className="text-gray-600">
-                Quick and accurate prescription filling services for all your medication needs.
-              </p>
+      {/* Services Section */}
+      <section className="bg-gradient-to-b from-white to-emerald-50 py-12 sm:py-20">
+        <div className="container mx-auto px-4 sm:px-6">
+          <h2 className="text-3xl sm:text-4xl font-bold text-center text-gray-800 mb-8 sm:mb-16">Our Services</h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8">
+            <div className="bg-white p-6 sm:p-8 rounded-2xl shadow-lg hover:shadow-xl transition-all transform hover:-translate-y-2">
+              <div className="text-4xl sm:text-5xl mb-6">⚕️</div>
+              <h3 className="text-lg sm:text-xl font-semibold text-gray-800 mb-4">Prescription Services</h3>
+              <p className="text-gray-600 mb-6">Quick and accurate prescription filling with expert verification</p>
+              <Link
+                href="/login"
+                className="text-emerald-600 hover:text-emerald-700 font-medium inline-flex items-center gap-2 group touch-manipulation"
+              >
+                Learn More <span className="transform transition-transform group-hover:translate-x-1">→</span>
+              </Link>
             </div>
 
-            {/* Service 2 */}
-            <div className="text-center p-6">
-              <div className="text-primary text-5xl mb-4">💊</div>
-              <h3 className="text-xl font-semibold text-green-700 mb-3">
-                OTC Medications
-              </h3>
-              <p className="text-gray-600">
-                A variety of over-the-counter medications for common health conditions.
-              </p>
+            <div className="bg-white p-6 sm:p-8 rounded-2xl shadow-lg hover:shadow-xl transition-all transform hover:-translate-y-2">
+              <div className="text-4xl sm:text-5xl mb-6">🚚</div>
+              <h3 className="text-lg sm:text-xl font-semibold text-gray-800 mb-4">Home Delivery</h3>
+              <p className="text-gray-600 mb-6">Convenient doorstep delivery with temperature-controlled packaging</p>
+              <Link
+                href="/login"
+                className="text-emerald-600 hover:text-emerald-700 font-medium inline-flex items-center gap-2 group touch-manipulation"
+              >
+                Learn More <span className="transform transition-transform group-hover:translate-x-1">→</span>
+              </Link>
             </div>
 
-            {/* Service 3 */}
-            <div className="text-center p-6">
-              <div className="text-primary text-5xl mb-4">👩‍⚕️</div>
-              <h3 className="text-xl font-semibold text-green-700 mb-3">
-                Health Consultations
-              </h3>
-              <p className="text-gray-600">
-                Personalized advice and support from our experienced pharmacists.
-              </p>
+            <div className="bg-white p-6 sm:p-8 rounded-2xl shadow-lg hover:shadow-xl transition-all transform hover:-translate-y-2">
+              <div className="text-4xl sm:text-5xl mb-6">💊</div>
+              <h3 className="text-lg sm:text-xl font-semibold text-gray-800 mb-4">Medication Review</h3>
+              <p className="text-gray-600 mb-6">Comprehensive medication review and interaction checks</p>
+              <Link
+                href="/login"
+                className="text-emerald-600 hover:text-emerald-700 font-medium inline-flex items-center gap-2 group touch-manipulation"
+              >
+                Learn More <span className="transform transition-transform group-hover:translate-x-1">→</span>
+              </Link>
             </div>
 
-            {/* service 4 */}
-            <div className="text-center p-6">
-              <div className="text-primary text-5xl mb-4">💉
-              </div>
-              <h3 className="text-xl font-semibold text-green-700 mb-3">
-              Vaccinations
-              </h3>
-              <p className="text-gray-600">
-              Protect yourself and your community with our available vaccinations. Schedule your appointment online.
-              </p>
+            <div className="bg-white p-6 sm:p-8 rounded-2xl shadow-lg hover:shadow-xl transition-all transform hover:-translate-y-2">
+              <div className="text-4xl sm:text-5xl mb-6">📱</div>
+              <h3 className="text-lg sm:text-xl font-semibold text-gray-800 mb-4">Digital Consultation</h3>
+              <p className="text-gray-600 mb-6">24/7 online pharmacist consultation and support</p>
+              <Link
+                href="/login"
+                className="text-emerald-600 hover:text-emerald-700 font-medium inline-flex items-center gap-2 group touch-manipulation"
+              >
+                Learn More <span className="transform transition-transform group-hover:translate-x-1">→</span>
+              </Link>
             </div>
-            
           </div>
         </div>
       </section>
 
       {/* Health Tips Section */}
-<section className="py-16">
-  <div className="container mx-auto px-6">
-    <h2 className="text-3xl font-bold text-black mb-12">
-      Health Tips & Wellness
-    </h2>
+      <section className="container mx-auto px-4 sm:px-6 py-12 sm:py-20">
+        <h2 className="text-3xl sm:text-4xl font-bold text-center text-gray-800 mb-8 sm:mb-16">Health Tips & Resources</h2>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
+          <div className="bg-white p-4 sm:p-6 rounded-2xl shadow-lg hover:shadow-xl transition-all">
+            <h3 className="text-lg sm:text-xl font-semibold text-gray-800 mb-4">Medication Safety</h3>
+            <ul className="space-y-3 text-gray-600">
+              <li className="flex items-center gap-2 text-sm sm:text-base">
+                <span className="text-emerald-600">✓</span>
+                Store medications at proper temperature
+              </li>
+              <li className="flex items-center gap-2 text-sm sm:text-base">
+                <span className="text-emerald-600">✓</span>
+                Keep track of expiration dates
+              </li>
+              <li className="flex items-center gap-2 text-sm sm:text-base">
+                <span className="text-emerald-600">✓</span>
+                Never share prescriptions
+              </li>
+            </ul>
+          </div>
 
-    <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-      
-      {/* Tip 1 */}
-      <div className="bg-white p-6 rounded-xl shadow-md hover:shadow-lg transition">
-        <h3 className="text-lg font-semibold text-emerald-700 mb-2">
-          🥗 Eat Well, Stay Strong
-        </h3>
-        <p className="text-gray-700 text-sm">
-          Discover the best foods to support your immune system and improve energy naturally.
-        </p>
-        <a href="#" className="text-blue-700 text-sm font-medium mt-3 inline-block hover:underline">
-          Read more
-        </a>
-      </div>
+          <div className="bg-white p-4 sm:p-6 rounded-2xl shadow-lg hover:shadow-xl transition-all">
+            <h3 className="text-lg sm:text-xl font-semibold text-gray-800 mb-4">Wellness Basics</h3>
+            <ul className="space-y-3 text-gray-600">
+              <li className="flex items-center gap-2 text-sm sm:text-base">
+                <span className="text-emerald-600">✓</span>
+                Stay hydrated throughout the day
+              </li>
+              <li className="flex items-center gap-2 text-sm sm:text-base">
+                <span className="text-emerald-600">✓</span>
+                Maintain a balanced diet
+              </li>
+              <li className="flex items-center gap-2 text-sm sm:text-base">
+                <span className="text-emerald-600">✓</span>
+                Get regular exercise
+              </li>
+            </ul>
+          </div>
 
-      {/* Tip 2 */}
-      <div className="bg-white p-6 rounded-xl shadow-md hover:shadow-lg transition">
-        <h3 className="text-lg font-semibold text-emerald-700 mb-2">
-          💤 Sleep & Mental Health
-        </h3>
-        <p className="text-gray-700 text-sm">
-          Learn how quality sleep impacts mental clarity, mood, and overall well-being.
-        </p>
-        <a href="#" className="text-blue-700 text-sm font-medium mt-3 inline-block hover:underline">
-          Read more
-        </a>
-      </div>
+          <div className="bg-white p-4 sm:p-6 rounded-2xl shadow-lg hover:shadow-xl transition-all">
+            <h3 className="text-lg sm:text-xl font-semibold text-gray-800 mb-4">When to Seek Help</h3>
+            <ul className="space-y-3 text-gray-600">
+              <li className="flex items-center gap-2 text-sm sm:text-base">
+                <span className="text-emerald-600">✓</span>
+                Unusual medication reactions
+              </li>
+              <li className="flex items-center gap-2 text-sm sm:text-base">
+                <span className="text-emerald-600">✓</span>
+                Persistent side effects
+              </li>
+              <li className="flex items-center gap-2 text-sm sm:text-base">
+                <span className="text-emerald-600">✓</span>
+                Questions about interactions
+              </li>
+            </ul>
+          </div>
+        </div>
+      </section>
 
-      {/* Tip 3 */}
-      <div className="bg-white p-6 rounded-xl shadow-md hover:shadow-lg transition">
-        <h3 className="text-lg font-semibold text-emerald-700 mb-2">
-          🚶‍♂️ Fitness Basics
-        </h3>
-        <p className="text-gray-700 text-sm">
-          Get started with simple, effective routines to improve your physical health.
-        </p>
-        <a href="#" className="text-blue-700 text-sm font-medium mt-3 inline-block hover:underline">
-          Read more
-        </a>
-      </div>
+      {/* Call to Action */}
+      <section className="bg-emerald-600 py-12 sm:py-20">
+        <div className="container mx-auto px-4 sm:px-6 text-center">
+          <h2 className="text-3xl sm:text-4xl font-bold text-white mb-6 sm:mb-8">Ready to Get Started?</h2>
+          <p className="text-emerald-100 text-lg sm:text-xl mb-8 sm:mb-12 max-w-2xl mx-auto">
+            Join thousands of satisfied customers who trust us with their health needs.
+          </p>
+          <Link
+            href="/login"
+            className="bg-white text-emerald-600 px-6 sm:px-8 py-3 sm:py-4 rounded-full text-lg font-medium inline-block hover:bg-emerald-50 transition-colors transform hover:scale-105 w-full sm:w-auto touch-manipulation"
+          >
+            Create Your Account
+          </Link>
+        </div>
+      </section>
 
-    </div>
-  </div>
-</section>
-
-      
-      
-
-      {/* Footer */}
       <Footer />
     </div>
   )
