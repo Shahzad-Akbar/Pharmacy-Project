@@ -212,6 +212,22 @@ export default function ProductsPage() {
   }
 
   useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        setLoading(true)
+        let url = '/api/products/get-products?'
+        if (filterCategory !== 'all') url += `category=${filterCategory}&`
+        if (searchQuery) url += `search=${searchQuery}`
+  
+        const response = await axios.get(url)
+        setProducts(response.data)
+      } catch (error) {
+        toast.error('Failed to fetch products')
+        console.error('Error:', error)
+      } finally {
+        setLoading(false)
+      }
+    }
     fetchProducts()
   }, [searchQuery, filterCategory])
 

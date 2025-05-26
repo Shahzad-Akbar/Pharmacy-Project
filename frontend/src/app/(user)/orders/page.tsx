@@ -269,7 +269,9 @@ export default function OrdersPage() {
                   <ul className="space-y-1">
                     {order.items.map((item, index) => (
                       <li key={index} className="text-sm text-gray-600 flex justify-between">
-                        <span>{item.product.name} × {item.quantity}</span>
+                        <span>
+                          {item.product ? item.product.name : 'Product Unavailable'} × {item.quantity}
+                        </span>
                         <span>₹{item.price * item.quantity}</span>
                       </li>
                     ))}

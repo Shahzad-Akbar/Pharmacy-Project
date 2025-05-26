@@ -18,13 +18,34 @@ interface CartItem {
   price: number
 }
 
+interface OrderData {
+  items: Array<{
+    product: string
+    quantity: number
+    price: number
+  }>
+  total: number
+  shippingAddress: {
+    name: string
+    phone: string
+    address: string
+    city: string
+    state: string
+    pincode: string
+  }
+  deliveryCharge: number
+  paymentMethod: string
+  notes: string
+  paymentScreenshot?: string  // Make it optional
+}
+
 export default function CheckoutPage() {
   const router = useRouter()
   const [step, setStep] = useState(1)
   const [cartItems, setCartItems] = useState<CartItem[]>([])
   const [loading, setLoading] = useState(true)
   const [submitting, setSubmitting] = useState(false)
-  const [paymentMethod, setPaymentMethod] = useState('COD') // Default to COD
+  const [paymentMethod, setPaymentMethod] = useState('COD')
   const [formData, setFormData] = useState({
     name: '',
     phone: '',
@@ -33,7 +54,7 @@ export default function CheckoutPage() {
     state: '',
     pincode: '',
     deliveryTime: 'morning',
-    paymentScreenshot: File || null
+    paymentScreenshot: null as File | null  // Correct type definition
   })
 
   useEffect(() => {
@@ -74,7 +95,6 @@ export default function CheckoutPage() {
     e.preventDefault()
     if (step !== 3) return
 
-    // Only validate payment screenshot if payment method is QR
     if (paymentMethod === 'QR' && !formData.paymentScreenshot) {
       toast.error('Please upload payment screenshot')
       setStep(2)
@@ -90,7 +110,6 @@ export default function CheckoutPage() {
         return
       }
       
-      // Structure the shipping address as required by backend
       const shippingAddress = {
         name: formData.name,
         phone: formData.phone,
@@ -100,15 +119,14 @@ export default function CheckoutPage() {
         pincode: formData.pincode
       }
       
-      // Create items data for the order
       const itemsData = cartItems.map(item => ({
         product: item.product._id,
         quantity: item.quantity,
         price: item.product.price * item.quantity
       }))
 
-      // Prepare order data based on payment method
-      const orderData = {
+      // Initialize orderData with correct typing
+      const orderData: OrderData = {
         items: itemsData,
         total,
         shippingAddress,
@@ -117,21 +135,23 @@ export default function CheckoutPage() {
         notes: formData.deliveryTime
       }
 
-      // Add payment screenshot only if payment method is QR
+      // Add payment screenshot properly
       if (paymentMethod === 'QR' && formData.paymentScreenshot) {
-        orderData.paymentScreenshot = formData.paymentScreenshot.toString()
+        // Convert file to base64
+        const reader = new FileReader()
+        reader.onloadend = async () => {
+          orderData.paymentScreenshot = reader.result as string
+        }
+        reader.readAsDataURL(formData.paymentScreenshot)
       }
 
       const response = await axios.post('/api/orders/create', orderData, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        }
+        headers: { Authorization: `Bearer ${token}` }
       })
 
       if (response.data) {
         toast.success('Order placed successfully!')
-        // Clear cart after successful order
-        await axios.delete('/api/cart/clear',{
+        await axios.delete('/api/cart/clear', {
           headers: { Authorization: `Bearer ${token}` }
         })
         router.push('/orders')
@@ -144,6 +164,13 @@ export default function CheckoutPage() {
     }
   }
 
+  // Update file input handler
+  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (file) {
+      setFormData({ ...formData, paymentScreenshot: file })
+    }
+  }
   if (loading) {
     return (
       <div className="container mx-auto px-4 py-16 text-center">
@@ -420,14 +447,12 @@ export default function CheckoutPage() {
                       <ImageUp size={20} />
                     </div>
                     <input
-                      type="file"
-                      accept="image/*"
-                      name="paymentScreenshot"
-                      onChange={(e) => {
-                        setFormData({...formData, paymentScreenshot: e.target.files[0]})
-                      }}
-                      className="w-full pl-10 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 text-gray-800"
-                    />
+  type="file"
+  accept="image/*"
+  name="paymentScreenshot"
+  onChange={handleFileUpload}
+  className="w-full pl-10 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 text-gray-800"
+/>
                   </div>
                 </div>
               )}

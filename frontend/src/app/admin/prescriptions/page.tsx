@@ -1,9 +1,16 @@
 'use client';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { format } from 'date-fns';
 import Image from 'next/image';
 import axios from 'axios';
 import { toast } from 'react-hot-toast';
+
+interface PrescriptionProduct {
+  productId: string;
+  name: string;
+  quantity: number;
+  price: number;
+}
 
 interface Prescription {
   _id: string;
@@ -17,7 +24,7 @@ interface Prescription {
   doctorContact: string;
   issueDate: string;
   expiryDate: string;
-  products: any[];
+  products: PrescriptionProduct[];
   verificationNotes?: string;
   verifiedBy?: {
     username: string;
@@ -35,37 +42,7 @@ export default function AdminPrescriptions() {
     status: ''
   });
 
-  useEffect(() => {
-    fetchPrescriptions();
-  }, []);
-
-  useEffect(() => {
-    applyFilters();
-  }, [filters, prescriptions]);
-
-  const fetchPrescriptions = async () => {
-    const token = localStorage.getItem('token');
-    if (!token){
-      console.error('No token found');
-    }
-    try {
-      const response = await axios.get('/api/prescriptions/admin/all', {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      });
-      
-      setPrescriptions(response.data);
-      setFilteredPrescriptions(response.data);
-    } catch (error: any) {
-      console.error('Error fetching prescriptions:', error);
-      toast.error(error.message);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const applyFilters = () => {
+  const applyFilters = useCallback(() => {
     let filtered = Array.isArray(prescriptions) ? [...prescriptions] : [];
 
     // Filter by user search (email or username)
@@ -85,6 +62,41 @@ export default function AdminPrescriptions() {
     }
 
     setFilteredPrescriptions(filtered);
+  }, [filters, prescriptions]);
+
+  useEffect(() => {
+    fetchPrescriptions();
+  }, []);
+
+  useEffect(() => {
+    applyFilters();
+  }, [filters, prescriptions, applyFilters]);
+
+  const fetchPrescriptions = async () => {
+    const token = localStorage.getItem('token');
+    if (!token){
+      console.error('No token found');
+      return;
+    }
+    try {
+      const response = await axios.get('/api/prescriptions/admin/all', {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      
+      setPrescriptions(response.data);
+      setFilteredPrescriptions(response.data);
+    } catch (error) {
+      console.error('Error fetching prescriptions:', error);
+      if (error instanceof Error) {
+        toast.error(error.message);
+      } else {
+        toast.error('Failed to fetch prescriptions');
+      }
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleVerification = async (prescriptionId: string, status: 'approved' | 'rejected' | 'pending', action: 'Approved' | 'Rejected' | 'Pending') => {
@@ -99,7 +111,6 @@ export default function AdminPrescriptions() {
         },
       });
       
-      // Update the prescription in the local state
       setPrescriptions(prevPrescriptions => {
         return prevPrescriptions.map(p => 
           p._id === prescriptionId ? { ...p, status, verificationDate: new Date().toISOString() } : p
@@ -107,11 +118,15 @@ export default function AdminPrescriptions() {
       });
       
       toast.success(`${action} successfully`);
-    } catch (error: any) {
+    } catch (error) {
       console.error('Error verifying prescription:', error);
-      toast.error(error.message);
+      if (error instanceof Error) {
+        toast.error(error.message);
+      } else {
+        toast.error('Failed to verify prescription');
+      }
     }
-  }
+  };
 
   if (loading) return <div>Loading...</div>;
 

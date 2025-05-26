@@ -50,7 +50,10 @@ export default function CartPage() {
   }, [])
 
   // Update subtotal calculation to use product price instead of item price
-  const subtotal = cartItems.reduce((sum, item) => sum + (item.product.price * item.quantity), 0)
+  const subtotal = cartItems.reduce((sum, item) => {
+    if (!item.product) return sum;
+    return sum + (item.product.price * item.quantity);
+  }, 0);
   const deliveryCharge = 40
   const total = subtotal + deliveryCharge
   
@@ -168,38 +171,49 @@ export default function CartPage() {
             {cartItems.map((item) => (
               <div key={item._id} className="bg-white rounded-lg p-4 flex items-center gap-4">
                 <div className="w-20 h-20 bg-gray-100 rounded-md">
-                  <Image
-                    src={item.product.image}
-                    alt={item.product.name}    
-                    height={200}
-                    width={200}        
-                    className="w-full h-full object-cover rounded-md"
-                  />
+                  {item.product ? (
+                    <Image
+                      src={item.product.image}
+                      alt={item.product.name}
+                      height={200}
+                      width={200}
+                      className="object-cover w-full h-full rounded-md"
+                    />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center text-gray-400">
+                      Product Unavailable
+                    </div>
+                  )}
                 </div>
                 <div className="flex-grow">
-                  <h3 className="font-medium text-gray-800">{item.product.name}</h3>
-                  <p className="text-blue-600 font-bold">₹{item.price}</p>
+                  <h3 className="font-medium text-gray-800">
+                    {item.product ? item.product.name : 'Product Unavailable'}
+                  </h3>
+                  <p className="text-blue-600 font-bold">
+                    ₹{item.product ? item.product.price : 0}
+                  </p>
                 </div>
                 <div className="flex items-center gap-2">
                   <button
-                    onClick={() => updateQuantity(item.product._id, item.quantity - 1)}
+                    onClick={() => item.product ? updateQuantity(item.product._id, item.quantity - 1) : null}
                     className="p-1 rounded bg-gray-100 text-gray-600 hover:bg-gray-200"
-                    disabled={item.quantity <= 1}
+                    disabled={!item.product || item.quantity <= 1}
                   >
                     <Minus size={16} />
                   </button>
                   <span className="w-8 text-center text-gray-800">{item.quantity}</span>
                   <button
-                    onClick={() => updateQuantity(item.product._id, item.quantity + 1)}
+                    onClick={() => item.product ? updateQuantity(item.product._id, item.quantity + 1) : null}
                     className="p-1 rounded bg-gray-100 text-gray-600 hover:bg-gray-200"
-                    disabled={item.quantity >= item.product.stock}
+                    disabled={!item.product || item.quantity >= item.product.stock}
                   >
                     <Plus size={16} />
                   </button>
                 </div>
                 <button
-                  onClick={() => removeItem(item.product._id)}
+                  onClick={() => item.product ? removeItem(item.product._id) : null}
                   className="p-2 rounded text-red-600 hover:bg-red-50"
+                  disabled={!item.product}
                 >
                   <Trash2 size={20} />
                 </button>

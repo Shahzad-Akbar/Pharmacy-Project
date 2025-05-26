@@ -13,6 +13,22 @@ import {
   AlertCircle,
 } from 'lucide-react'
 
+// Add interface for order type
+interface Order {
+  _id: string
+  id: string
+  date: string
+  amount: number
+  status: string
+}
+
+// Add interface for notification type
+interface Notification {
+  id: string
+  message: string
+  time: string
+}
+
 export default function UserDashboard() {
   const [dashboardData, setDashboardData] = useState({
     totalOrders: '0',
@@ -22,8 +38,8 @@ export default function UserDashboard() {
     userName: ''
   })
 
-  const [notifications, setNotifications] = useState([])
-  const [recentOrders, setRecentOrders] = useState([])
+  const [notifications, setNotifications] = useState<Notification[]>([])
+  const [recentOrders, setRecentOrders] = useState<Order[]>([])
   const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {

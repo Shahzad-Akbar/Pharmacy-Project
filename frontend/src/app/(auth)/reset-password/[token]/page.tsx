@@ -1,4 +1,5 @@
 'use client'
+import { useParams } from 'next/navigation'
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
@@ -6,7 +7,11 @@ import axios from 'axios'
 import PublicNavbar from '@/components/shared/PublicNavbar'
 import { Eye, EyeOff } from 'lucide-react'
 
-export default function ResetPasswordPage({ params }: { params: { token: string } }) {
+export default function ResetPasswordPage() {
+  //used useParams because i was getting params incompatible at build time
+  const params = useParams()
+  const token = params.token
+ 
   const router = useRouter()
   const [isLoading, setIsLoading] = useState(false)
   const [showPassword, setShowPassword] = useState(false)
@@ -44,7 +49,7 @@ export default function ResetPasswordPage({ params }: { params: { token: string 
     try {
       setIsLoading(true)
       await axios.post('/api/auth/reset-password', {
-        resetToken: params.token,
+        resetToken: token,
         newPassword: formData.password
       })
       router.push('/login')
