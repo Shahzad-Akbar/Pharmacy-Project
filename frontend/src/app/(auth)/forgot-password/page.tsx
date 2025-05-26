@@ -16,11 +16,16 @@ export default function ForgotPasswordPage() {
     
     try {
       setIsLoading(true)
-      await axios.post('http://localhost:5000/api/auth/forgot-password', { email })
+      await axios.post('/api/auth/forgot-password', { email })
       setIsSubmitted(true)
       setEmail('')
-    } catch (error) {
-      setError(error.response?.data?.message || 'Failed to send reset link. Please try again.')
+    } catch (err) {
+      // Type guard for AxiosError
+      if (axios.isAxiosError(err)) {
+        setError(err.response?.data?.message || 'Failed to send reset link. Please try again.')
+      } else {
+        alert('Something went wrong');
+      }
     } finally {
       setIsLoading(false)
     }

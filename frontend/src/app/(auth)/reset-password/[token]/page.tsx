@@ -16,7 +16,7 @@ export default function ResetPasswordPage({ params }: { params: { token: string 
     confirmPassword: ''
   })
 
-  const handleChange = (e) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({
       ...formData,
       [e.target.name]: e.target.value
@@ -27,7 +27,7 @@ export default function ResetPasswordPage({ params }: { params: { token: string 
     setShowPassword(!showPassword)
   }
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setError('')
 
@@ -40,19 +40,23 @@ export default function ResetPasswordPage({ params }: { params: { token: string 
       setError('Password must be at least 6 characters long')
       return
     }
-    // console.log("Token: ", params.token)
 
     try {
       setIsLoading(true)
-      await axios.post('http://localhost:5000/api/auth/reset-password', {
+      await axios.post('/api/auth/reset-password', {
         resetToken: params.token,
         newPassword: formData.password
       })
       router.push('/login')
-    } catch (error) {
-      console.log(error)
-      setError(error.response?.data?.message || 'Failed to reset password. Please try again.')
-    } finally {
+    } catch (err) {
+      // Type guard for AxiosError
+      if (axios.isAxiosError(err)) {
+        console.log(error)
+        setError(err.response?.data?.message || 'Failed to reset password. Please try again.');
+      } else {
+        alert('Something went wrong');
+      }
+    }  finally {
       setIsLoading(false)
     }
   }

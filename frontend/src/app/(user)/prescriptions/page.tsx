@@ -42,7 +42,7 @@ export default function PrescriptionsPage() {
         return
       }
 
-      const response = await axios.get('http://localhost:5000/api/prescriptions/user', {
+      const response = await axios.get('/api/prescriptions/user', {
         headers: { Authorization: `Bearer ${token}` }
       })
       setPrescriptions(response.data)
@@ -95,7 +95,7 @@ export default function PrescriptionsPage() {
         setImage(base64Image);
       }
 
-      await axios.post('http://localhost:5000/api/prescriptions/upload',
+      await axios.post('/api/prescriptions/upload',
         {
           doctorName: formData.doctorName,
           doctorContact: formData.doctorContact,

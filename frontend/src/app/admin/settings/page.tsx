@@ -68,7 +68,7 @@ export default function SettingsPage() {
     const token = localStorage.getItem('token')
     try {
       setLoading(true)
-      const response = await axios.get('http://localhost:5000/api/store-settings', {
+      const response = await axios.get('/api/store-settings', {
         headers: { Authorization: `Bearer ${token}` }
       })
       setStoreSettings(response.data)
@@ -85,7 +85,7 @@ export default function SettingsPage() {
     const token = localStorage.getItem('token')
     try {
       setLoading(true)
-      await axios.put('http://localhost:5000/api/store-settings',
+      await axios.put('/api/store-settings',
         storeSettings,
         {
           headers: { Authorization: `Bearer ${token}` }

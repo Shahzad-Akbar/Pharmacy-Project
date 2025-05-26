@@ -30,20 +30,14 @@ export default function UserDashboard() {
     const fetchDashboardData = async () => {
       try {
         const token = localStorage.getItem('token')
-        // const headers = { Authorization: `Bearer ${token}` }
 
-        // const [statsResponse, notificationsResponse, ordersResponse] = await Promise.all([
-        //   axios.get('http://localhost:5000/api/dashboard/stats', { headers }),
-        //   axios.get('http://localhost:5000/api/notifications/recent', { headers }),
-        //   axios.get('http://localhost:5000/api/orders/recent', { headers })
-        // ])
-        const statsResponse = await axios.get('http://localhost:5000/api/dashboard/stats',{
+        const statsResponse = await axios.get('/api/dashboard/stats',{
           headers: { Authorization: `Bearer ${token}` }
         })
-        const notificationsResponse = await axios.get('http://localhost:5000/api/dashboard/notifications/recent',{
+        const notificationsResponse = await axios.get('/api/dashboard/notifications/recent',{
           headers: { Authorization: `Bearer ${token}` }
         })
-        const ordersResponse = await axios.get('http://localhost:5000/api/dashboard/orders/recent',{
+        const ordersResponse = await axios.get('/api/dashboard/orders/recent',{
           headers: { Authorization: `Bearer ${token}`}
         })
 

@@ -61,14 +61,14 @@ export default function AdminDashboard() {
       setLoading(true)
       
       // Fetch dashboard stats
-      const statsResponse = await axios.get('http://localhost:5000/api/dashboard/admin/stats', {
+      const statsResponse = await axios.get('/api/dashboard/admin/stats', {
         headers: { Authorization: `Bearer ${token}` }
       })
       setStats(statsResponse.data)
   
       try {
         // Fetch recent orders - handle empty state gracefully
-        const ordersResponse = await axios.get('http://localhost:5000/api/dashboard/admin/recent-order', {
+        const ordersResponse = await axios.get('/api/dashboard/admin/recent-order', {
           headers: { Authorization: `Bearer ${token}` }
         })
         setRecentOrders(ordersResponse.data)
@@ -78,7 +78,7 @@ export default function AdminDashboard() {
       }
   
       // Fetch notifications
-      const notificationsResponse = await axios.get('http://localhost:5000/api/dashboard/admin/low-stock', {
+      const notificationsResponse = await axios.get('/api/dashboard/admin/low-stock', {
         headers: { Authorization: `Bearer ${token}` }
       })
 

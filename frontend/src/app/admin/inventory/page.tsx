@@ -45,7 +45,7 @@ export default function InventoryPage() {
     const token = localStorage.getItem('token')
     try {
       setLoading(true)
-      const response = await axios.get('http://localhost:5000/api/inventory', {
+      const response = await axios.get('/api/inventory', {
         headers: { Authorization: `Bearer ${token}` }
       })
       setInventory(response.data)
@@ -65,7 +65,7 @@ export default function InventoryPage() {
 
     try {
       const response = await axios.put(
-        `http://localhost:5000/api/inventory/stock/${selectedItem._id}`,
+        `/api/inventory/stock/${selectedItem._id}`,
         selectedItem,
         {
           headers: { Authorization: `Bearer ${token}` }
@@ -86,7 +86,7 @@ export default function InventoryPage() {
   const handleRestock = async (id: string) => {
     const token = localStorage.getItem('token')
     try {
-      const response = await axios.post(`http://localhost:5000/api/inventory/restock/${id}`, {
+      const response = await axios.post(`/api/inventory/restock/${id}`, {
         quantity: 10
       }, {
         headers: { Authorization: `Bearer ${token}` }

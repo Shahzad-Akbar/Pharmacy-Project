@@ -34,7 +34,7 @@ export default function WishlistPage() {
         return
       }
 
-      const response = await axios.get('http://localhost:5000/api/users/wishlist', {
+      const response = await axios.get('/api/users/wishlist', {
         headers: { Authorization: `Bearer ${token}` }
       })
       setWishlistItems(response.data.wishlist)
@@ -52,7 +52,7 @@ export default function WishlistPage() {
       const token = localStorage.getItem('token')
       if (!token) return
 
-      await axios.delete(`http://localhost:5000/api/users/wishlist/${productId}`, {
+      await axios.delete(`/api/users/wishlist/${productId}`, {
         headers: { Authorization: `Bearer ${token}` }
       })
       setWishlistItems(prev => prev.filter(item => item._id !== productId))      
@@ -73,7 +73,7 @@ export default function WishlistPage() {
 
       setLoadingCartItems(prev => [...prev, productId])
 
-      await axios.post('http://localhost:5000/api/cart/add', 
+      await axios.post('/api/cart/add', 
         { productId, quantity: 1 },
         { headers: { Authorization: `Bearer ${token}` } }
       )

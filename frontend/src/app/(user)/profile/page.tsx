@@ -49,7 +49,7 @@ export default function ProfilePage() {
         return
       }
 
-      const response = await axios.get('http://localhost:5000/api/users/profile', {
+      const response = await axios.get('/api/users/profile', {
         headers: { Authorization: `Bearer ${token}` }
       })
       setFormData(response.data)
@@ -100,7 +100,7 @@ export default function ProfilePage() {
       }
 
       const response = await axios.put(
-        'http://localhost:5000/api/users/update-profile',
+        '/api/users/update-profile',
         updateData,
         {
           headers: {

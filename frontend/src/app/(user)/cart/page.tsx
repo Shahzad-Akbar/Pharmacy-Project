@@ -33,7 +33,7 @@ export default function CartPage() {
     }
     const fetchCartItems = async () => {
       try {
-        const response = await axios.get('http://localhost:5000/api/cart', {
+        const response = await axios.get('/api/cart', {
           headers: { Authorization: `Bearer ${token}` }
         });
         // Update to match backend structure
@@ -62,7 +62,7 @@ export default function CartPage() {
         return
       }
 
-      await axios.put('http://localhost:5000/api/cart/update', 
+      await axios.put('/api/cart/update', 
         { productId, quantity: newQuantity },
         { headers: { Authorization: `Bearer ${token}` } }
       )
@@ -89,7 +89,7 @@ export default function CartPage() {
         return
       }
 
-      await axios.delete(`http://localhost:5000/api/cart/remove/${productId}`, {
+      await axios.delete(`/api/cart/remove/${productId}`, {
         headers: { Authorization: `Bearer ${token}` }
       })
       

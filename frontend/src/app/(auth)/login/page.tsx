@@ -15,7 +15,7 @@ export default function LoginPage() {
     password: ''
   });
 
-  const handleChange = (e) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({
       ...prev,
@@ -27,12 +27,12 @@ export default function LoginPage() {
     setShowPassword(!showPassword);
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     try {
       setIsLoading(true);
-      const response = await axios.post('http://localhost:5000/api/auth/login', {
+      const response = await axios.post('/api/auth/login', {
         email: formData.email,
         password: formData.password
       });
@@ -44,8 +44,13 @@ export default function LoginPage() {
       } else {
         router.push('/dashboard');
       }
-    } catch (error) {
-      alert(error.response?.data?.message || 'Invalid credentials');
+    } catch (err) {
+      // Type guard for AxiosError
+      if (axios.isAxiosError(err)) {
+        alert(err.response?.data?.message || 'Invalid credentials');
+      } else {
+        alert('Something went wrong');
+      }
     } finally {
       setIsLoading(false);
     }

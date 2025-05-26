@@ -18,11 +18,11 @@ export default function SignupPage() {
     termsAccepted: false
   })
 
-  const handleChange = (e) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({...formData, [e.target.name]: e.target.value});
   }
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     if (!formData.termsAccepted) {
@@ -32,7 +32,7 @@ export default function SignupPage() {
 
     try {
       setIsLoading(true);
-      const response = await axios.post('http://localhost:5000/api/auth/signup', {
+      const response = await axios.post('/api/auth/signup', {
         username: formData.username,
         fullName: formData.fullName,
         email: formData.email,
@@ -42,8 +42,12 @@ export default function SignupPage() {
       
       localStorage.setItem('token', response.data.token);
       router.push('/login');
-    } catch (error) {
-      alert(error.response?.data?.message || 'Something went wrong!');
+    } catch (err) {
+      if (axios.isAxiosError(err)) {
+        alert(err.response?.data?.message || 'Something went wrong!');
+      }else {
+        alert('Something went wrong!');
+      }
     } finally {
       setIsLoading(false);
     }

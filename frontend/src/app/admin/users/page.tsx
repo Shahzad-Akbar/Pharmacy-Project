@@ -86,7 +86,7 @@ export default function UsersPage() {
   const fetchUsers = async () => {
     try {
       const token = localStorage.getItem('token')
-      const response = await axios.get('http://localhost:5000/api/users/admin/user', {
+      const response = await axios.get('/api/users/admin/user', {
         headers: {
           Authorization: `Bearer ${token}`
         }
@@ -108,7 +108,7 @@ export default function UsersPage() {
     e.preventDefault()
     try {
       const token = localStorage.getItem('token')
-      await axios.post('http://localhost:5000/api/users/admin/user', formData, {
+      await axios.post('/api/users/admin/user', formData, {
         headers: {
           Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -133,7 +133,7 @@ export default function UsersPage() {
       const updateData = { ...formData }
       if (!updateData.password) delete updateData.password
 
-      await axios.put(`http://localhost:5000/api/users/admin/user/${selectedUser._id}`, updateData, {
+      await axios.put(`/api/users/admin/user/${selectedUser._id}`, updateData, {
         headers: {
           Authorization: `Bearer ${token}`,
         }
@@ -153,7 +153,7 @@ export default function UsersPage() {
 
     try {
       const token = localStorage.getItem('token')
-      await axios.delete(`http://localhost:5000/api/users/admin/user/${selectedUser._id}`, {
+      await axios.delete(`/api/users/admin/user/${selectedUser._id}`, {
         headers: {
           Authorization: `Bearer ${token}`
         }
@@ -171,7 +171,7 @@ export default function UsersPage() {
   const handleStatusChange = async (userId: string, newStatus: 'active' | 'inactive' | 'blocked') => {
     try {
       const token = localStorage.getItem('token')
-      await axios.put(`http://localhost:5000/api/users/admin/user/${userId}/status`, 
+      await axios.put(`/api/users/admin/user/${userId}/status`, 
         { status: newStatus },
         {
           headers: {

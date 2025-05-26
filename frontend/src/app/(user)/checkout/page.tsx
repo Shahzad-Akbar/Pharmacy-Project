@@ -45,7 +45,7 @@ export default function CheckoutPage() {
 
     const fetchCartItems = async () => {
       try {
-        const response = await axios.get('http://localhost:5000/api/cart', {
+        const response = await axios.get('/api/cart', {
           headers: { Authorization: `Bearer ${token}` }
         })
         const items = response.data?.items || []
@@ -122,7 +122,7 @@ export default function CheckoutPage() {
         orderData.paymentScreenshot = formData.paymentScreenshot.toString()
       }
 
-      const response = await axios.post('http://localhost:5000/api/orders/create', orderData, {
+      const response = await axios.post('/api/orders/create', orderData, {
         headers: {
           Authorization: `Bearer ${token}`,
         }
@@ -131,7 +131,7 @@ export default function CheckoutPage() {
       if (response.data) {
         toast.success('Order placed successfully!')
         // Clear cart after successful order
-        await axios.delete('http://localhost:5000/api/cart/clear',{
+        await axios.delete('/api/cart/clear',{
           headers: { Authorization: `Bearer ${token}` }
         })
         router.push('/orders')

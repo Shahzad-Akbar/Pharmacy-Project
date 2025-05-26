@@ -68,7 +68,7 @@ export default function OrdersPage() {
   const fetchOrders = async () => {
     try {
       const token = localStorage.getItem('token')
-      const response = await axios.get('http://localhost:5000/api/orders/admin/all', {
+      const response = await axios.get('/api/orders/admin/all', {
         headers: {
           Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -96,7 +96,7 @@ export default function OrdersPage() {
       }
 
       const token = localStorage.getItem('token')
-      await axios.put(`http://localhost:5000/api/orders/${orderId}/status`, 
+      await axios.put(`/api/orders/${orderId}/status`, 
         { 
           status,
           tracking: status === 'in-transit' ? trackingInfo : undefined
@@ -127,7 +127,7 @@ export default function OrdersPage() {
       }
 
       const token = localStorage.getItem('token')
-      await axios.put(`http://localhost:5000/api/orders/${orderId}/payment`, 
+      await axios.put(`/api/orders/${orderId}/payment`, 
         { paymentStatus: status },
         {
           headers: {

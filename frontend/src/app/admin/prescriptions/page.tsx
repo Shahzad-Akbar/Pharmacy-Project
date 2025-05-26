@@ -49,7 +49,7 @@ export default function AdminPrescriptions() {
       console.error('No token found');
     }
     try {
-      const response = await axios.get('http://localhost:5000/api/prescriptions/admin/all', {
+      const response = await axios.get('/api/prescriptions/admin/all', {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -90,7 +90,7 @@ export default function AdminPrescriptions() {
   const handleVerification = async (prescriptionId: string, status: 'approved' | 'rejected' | 'pending', action: 'Approved' | 'Rejected' | 'Pending') => {
     const token = localStorage.getItem('token');
     try {
-      await axios.put(`http://localhost:5000/api/prescriptions/${prescriptionId}/verify`, {
+      await axios.put(`/api/prescriptions/${prescriptionId}/verify`, {
         status,
         verificationNotes: `${action} by admin`
       }, {

@@ -18,6 +18,7 @@ interface Product {
 }
 
 export default function ProductPage() {
+
   const [products, setProducts] = useState<Product[]>([])
   const [searchQuery, setSearchQuery] = useState('')
   const [filterCategory, setFilterCategory] = useState('all')
@@ -34,9 +35,11 @@ export default function ProductPage() {
         const response = await axios.get('http://localhost:5000/api/products/get-products')
         setProducts(response.data)
         setLoading(false)
-      } catch (err) {
-        setError('Failed to fetch products')
+      }catch(err){
         setLoading(false)
+        if(axios.isAxiosError(err)){
+          setError('Failed to fetch products')
+        }
       }
     }
 
@@ -60,7 +63,7 @@ export default function ProductPage() {
 
       setLoadingCartItems(prev => [...prev, productId])
 
-      await axios.post('http://localhost:5000/api/cart/add', 
+      await axios.post('/api/cart/add', 
         { productId, quantity: 1 },
         { headers: { Authorization: `Bearer ${token}` } }
       )
@@ -85,7 +88,7 @@ export default function ProductPage() {
 
       if (wishlistItems.includes(productId)) {
         // Fixed DELETE request configuration
-        await axios.delete(`http://localhost:5000/api/users/wishlist/${productId}`, {
+        await axios.delete(`/api/users/wishlist/${productId}`, {
           headers: { 
             Authorization: `Bearer ${token}`,
             'Content-Type': 'application/json'
@@ -94,7 +97,7 @@ export default function ProductPage() {
         setWishlistItems(wishlistItems.filter(id => id !== productId))
       } else {
         await axios.post(
-          `http://localhost:5000/api/users/wishlist/${productId}`,
+          `/api/users/wishlist/${productId}`,
           {},
           { headers: { Authorization: `Bearer ${token}` } }
         )

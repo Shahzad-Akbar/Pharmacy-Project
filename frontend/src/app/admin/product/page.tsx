@@ -132,7 +132,7 @@ export default function ProductsPage() {
   const fetchProducts = async () => {
     try {
       setLoading(true)
-      let url = 'http://localhost:5000/api/products/get-products?'
+      let url = '/api/products/get-products?'
       if (filterCategory !== 'all') url += `category=${filterCategory}&`
       if (searchQuery) url += `search=${searchQuery}`
 
@@ -165,14 +165,14 @@ export default function ProductsPage() {
       }
 
       if (editingProduct) {
-        await axios.put(`http://localhost:5000/api/products/${editingProduct._id}`, productData,{
+        await axios.put(`/api/products/${editingProduct._id}`, productData,{
           headers: {
             Authorization: `Bearer ${token}`
           }
         })
         toast.success('Product updated successfully')
       } else {
-        await axios.post('http://localhost:5000/api/products/create-product', productData,{
+        await axios.post('/api/products/create-product', productData,{
           headers: {
             Authorization: `Bearer ${token}`
           }
@@ -197,7 +197,7 @@ export default function ProductsPage() {
     }
     if (window.confirm('Are you sure you want to delete this product?')) {
       try {
-        await axios.delete(`http://localhost:5000/api/products/${productId}`,{
+        await axios.delete(`/api/products/${productId}`,{
           headers: {
             Authorization: `Bearer ${token}`
           }

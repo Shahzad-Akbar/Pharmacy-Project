@@ -66,7 +66,7 @@ export default function OrdersPage() {
     }
     try {
       setLoading(true)
-      const response = await axios.get('http://localhost:5000/api/orders/user', {
+      const response = await axios.get('/api/orders/user', {
         headers: {
           Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -168,7 +168,7 @@ export default function OrdersPage() {
 
     try {
       setUpdateLoading(true)
-      await axios.put(`http://localhost:5000/api/orders/${selectedOrder._id}`, {
+      await axios.put(`/api/orders/${selectedOrder._id}`, {
         shippingAddress: updatedAddress
       }, {
         headers: {
@@ -194,7 +194,7 @@ export default function OrdersPage() {
 
     try {
       setCancelLoading(true)
-      await axios.put(`http://localhost:5000/api/orders/${selectedOrder._id}/cancel`, {}, {
+      await axios.put(`/api/orders/${selectedOrder._id}/cancel`, {}, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem('token')}`,
           'Content-Type': 'application/json'
